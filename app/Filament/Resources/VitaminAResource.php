@@ -3,41 +3,76 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\VitaminAResource\Pages;
-use App\Filament\Resources\VitaminAResource\RelationManagers;
 use App\Models\VitaminA;
+use App\Models\Anak;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class VitaminAResource extends Resource
 {
-    protected static ?string $navigationLabel = 'Vitamin A';
-    protected static ?string $modelLabel = 'Vitamin A';
+    protected static ?string $model            = VitaminA::class;
+    protected static ?string $navigationLabel  = 'Vitamin A';
+    protected static ?string $modelLabel       = 'Data Vitamin A';
     protected static ?string $pluralModelLabel = 'Data Vitamin A';
-    protected static ?string $navigationGroup = 'Transaksi';
-    protected static ?int $navigationSort = 3;
+    protected static ?string $navigationGroup  = 'Transaksi';
+    protected static ?int    $navigationSort   = 3;
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\Select::make('anak_id')
-                    ->relationship('anak', 'id')
-                    ->required(),
-                Forms\Components\Select::make('posyandu_id')
-                    ->relationship('posyandu', 'id')
-                    ->required(),
-                Forms\Components\Select::make('kader_id')
-                    ->relationship('kader', 'name')
-                    ->required(),
-                Forms\Components\DatePicker::make('tgl_distribusi')
-                    ->required(),
-                Forms\Components\TextInput::make('dosis')
-                    ->required(),
+                Forms\Components\Section::make('Data Distribusi Vitamin A')
+                    ->schema([
+                        Forms\Components\Select::make('posyandu_id')
+                            ->label('Posyandu')
+                            ->relationship('posyandu', 'nama')
+                            ->searchable()
+                            ->preload()
+                            ->required()
+                            ->live()
+                            ->afterStateUpdated(function (Forms\Set $set) {
+                                $set('anak_id', null);
+                                $set('kader_id', null);
+                            }),
+                        Forms\Components\Select::make('anak_id')
+                            ->label('Nama Anak')
+                            ->options(fn (Forms\Get $get) =>
+                                Anak::where('posyandu_id', $get('posyandu_id'))
+                                    ->pluck('nama', 'id')
+                            )
+                            ->searchable()
+                            ->required()
+                            ->live()
+                            ->helperText('Pilih posyandu terlebih dahulu'),
+                        Forms\Components\Select::make('kader_id')
+                            ->label('Kader')
+                            ->options(fn (Forms\Get $get) =>
+                                \App\Models\User::where('role', 'kader')
+                                    ->where('posyandu_id', $get('posyandu_id'))
+                                    ->pluck('name', 'id')
+                            )
+                            ->searchable()
+                            ->required()
+                            ->live()
+                            ->helperText('Pilih posyandu terlebih dahulu'),
+                        Forms\Components\DatePicker::make('tgl_distribusi')
+                            ->label('Tanggal Distribusi')
+                            ->displayFormat('d/m/Y')
+                            ->maxDate(now())
+                            ->required()
+                            ->default(now()),
+                        Forms\Components\Select::make('dosis')
+                            ->label('Dosis')
+                            ->options([
+                                'Biru (100.000 IU)'  => 'Biru (100.000 IU) — 6-11 bulan',
+                                'Merah (200.000 IU)' => 'Merah (200.000 IU) — 12-59 bulan',
+                            ])
+                            ->required()
+                            ->helperText('Biru untuk usia 6-11 bulan, Merah untuk 12-59 bulan'),
+                    ])->columns(2),
             ]);
     }
 
@@ -45,58 +80,65 @@ class VitaminAResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('anak.id')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('posyandu.id')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('kader.name')
-                    ->numeric()
-                    ->sortable(),
+                Tables\Columns\TextColumn::make('posyandu.nama')
+                    ->label('Posyandu')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('anak.nama')
+                    ->label('Nama Anak')
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('tgl_distribusi')
-                    ->date()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('dosis'),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('deleted_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->label('Tgl Distribusi')
+                    ->date('d/m/Y'),
+                Tables\Columns\TextColumn::make('dosis')
+                    ->label('Dosis')
+                    ->badge()
+                    ->color(fn (string $state): string =>
+                        str_contains($state, 'Biru') ? 'info' : 'danger'
+                    ),
+                Tables\Columns\TextColumn::make('kader.name')
+                    ->label('Kader'),
             ])
+            ->defaultSort('tgl_distribusi', 'desc')
+            ->searchPlaceholder('Cari nama anak...')
             ->filters([
-                //
+                Tables\Filters\SelectFilter::make('posyandu_id')
+                    ->label('Posyandu')
+                    ->relationship('posyandu', 'nama'),
+                Tables\Filters\SelectFilter::make('dosis')
+                    ->label('Dosis')
+                    ->options([
+                        'Biru (100.000 IU)'  => 'Biru (100.000 IU)',
+                        'Merah (200.000 IU)' => 'Merah (200.000 IU)',
+                    ]),
             ])
+            ->filtersTriggerAction(
+                fn (Tables\Actions\Action $action) => $action
+                    ->button()
+                    ->label('Filter')
+                    ->icon('heroicon-o-funnel')
+            )
+            ->persistFiltersInSession()
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\EditAction::make()
+                    ->label('Edit Data')
+                    ->button()
+                    ->color('warning')
+                    ->icon(null),
+                Tables\Actions\DeleteAction::make()
+                    ->label('Hapus')
+                    ->button()
+                    ->color('danger')
+                    ->icon(null),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
-            ]);
-    }
-
-    public static function getRelations(): array
-    {
-        return [
-            //
-        ];
+            ->bulkActions([]);
     }
 
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListVitaminAS::route('/'),
+            'index'  => Pages\ListVitaminAS::route('/'),
             'create' => Pages\CreateVitaminA::route('/create'),
-            'edit' => Pages\EditVitaminA::route('/{record}/edit'),
+            'edit'   => Pages\EditVitaminA::route('/{record}/edit'),
         ];
     }
 }

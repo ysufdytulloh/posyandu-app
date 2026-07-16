@@ -16,6 +16,7 @@ class Anak extends Model
         'jk', 'tgl_lahir', 'anak_ke',
     ];
 
+    protected $table = 'anak';
     protected $casts = ['tgl_lahir' => 'date'];
 
     public function ibu(): BelongsTo       { return $this->belongsTo(Ibu::class); }

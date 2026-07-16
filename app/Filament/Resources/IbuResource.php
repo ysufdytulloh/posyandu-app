@@ -3,42 +3,88 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\IbuResource\Pages;
-use App\Filament\Resources\IbuResource\RelationManagers;
 use App\Models\Ibu;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class IbuResource extends Resource
 {
-    protected static ?string $navigationGroup = 'Master Data';
-    protected static ?string $navigationLabel = 'Data Ibu';
-    protected static ?string $modelLabel = 'Ibu';
+    protected static ?string $model            = Ibu::class;
+    protected static ?string $navigationGroup  = 'Master Data';
+    protected static ?string $navigationLabel  = 'Data Ibu';
+    protected static ?string $modelLabel       = 'Data Ibu';
     protected static ?string $pluralModelLabel = 'Data Ibu';
-    protected static ?int $navigationSort = 2;
+    protected static ?int    $navigationSort   = 2;
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\Select::make('posyandu_id')
-                    ->relationship('posyandu', 'id')
-                    ->required(),
-                Forms\Components\TextInput::make('nik')
-                    ->maxLength(20),
-                Forms\Components\TextInput::make('nama')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\DatePicker::make('tgl_lahir'),
-                Forms\Components\Textarea::make('alamat')
-                    ->columnSpanFull(),
-                Forms\Components\TextInput::make('no_hp')
-                    ->maxLength(15),
-                Forms\Components\TextInput::make('goldar'),
+                Forms\Components\Section::make('Informasi Ibu')
+                    ->schema([
+                        Forms\Components\Select::make('posyandu_id')
+                            ->label('Posyandu')
+                            ->relationship('posyandu', 'nama')
+                            ->searchable()
+                            ->preload()
+                            ->required(),
+
+                        Forms\Components\TextInput::make('nik')
+                            ->label('NIK')
+                            ->inputMode('numeric')
+                            ->minLength(16)
+                            ->maxLength(16)
+                            ->unique(ignoreRecord: true)
+                            ->placeholder('16 digit NIK')
+                            ->rule('digits:16'),
+
+                        Forms\Components\TextInput::make('nama')
+                            ->label('Nama Lengkap')
+                            ->required()
+                            ->maxLength(255)
+                            ->placeholder('Nama lengkap ibu')
+                            ->dehydrateStateUsing(fn (string $state): string => strtoupper($state))
+                            ->extraInputAttributes(['style' => 'text-transform: uppercase']),
+
+                        Forms\Components\DatePicker::make('tgl_lahir')
+                            ->label('Tanggal Lahir')
+                            ->displayFormat('d/m/Y')
+                            ->maxDate(now()),
+
+                        Forms\Components\TextInput::make('no_hp')
+                            ->label('No. HP')
+                            ->tel()
+                            ->prefix('+62')
+                            ->placeholder('81234567890')
+                            ->maxLength(13)
+                            ->dehydrateStateUsing(fn (?string $state): ?string =>
+                                $state ? '+62' . ltrim($state, '0') : null
+                            )
+                            ->formatStateUsing(fn (?string $state): ?string =>
+                                $state ? ltrim(str_replace('+62', '', $state), '0') : null
+                            ),
+
+                        Forms\Components\Select::make('goldar')
+                            ->label('Golongan Darah')
+                            ->options([
+                                'A'          => 'A',
+                                'B'          => 'B',
+                                'AB'         => 'AB',
+                                'O'          => 'O',
+                                'Tidak Tahu' => 'Tidak Tahu',
+                            ]),
+                    ])->columns(2),
+
+                Forms\Components\Section::make('Alamat')
+                    ->schema([
+                        Forms\Components\Textarea::make('alamat')
+                            ->label('Alamat Lengkap')
+                            ->rows(3)
+                            ->columnSpanFull(),
+                    ]),
             ]);
     }
 
@@ -46,58 +92,68 @@ class IbuResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('posyandu.id')
-                    ->numeric()
-                    ->sortable(),
+                Tables\Columns\TextColumn::make('posyandu.nama')
+                    ->label('Posyandu')
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('nik')
+                    ->label('NIK')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('nama')
+                    ->label('Nama Lengkap')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('tgl_lahir')
-                    ->date()
-                    ->sortable(),
+                    ->label('Tgl Lahir')
+                    ->date('d/m/Y'),
                 Tables\Columns\TextColumn::make('no_hp')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('goldar'),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('deleted_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->label('No. HP'),
+                Tables\Columns\TextColumn::make('goldar')
+                    ->label('Gol. Darah')
+                    ->badge()
+                    ->color('info'),
             ])
+            ->defaultSort('nama')
+            ->searchPlaceholder('Cari nama atau NIK...')
             ->filters([
-                //
+                Tables\Filters\SelectFilter::make('posyandu_id')
+                    ->label('Posyandu')
+                    ->relationship('posyandu', 'nama'),
+                Tables\Filters\SelectFilter::make('goldar')
+                    ->label('Golongan Darah')
+                    ->options([
+                        'A'  => 'A',
+                        'B'  => 'B',
+                        'AB' => 'AB',
+                        'O'  => 'O',
+                    ]),
             ])
+            ->filtersTriggerAction(
+                fn (Tables\Actions\Action $action) => $action
+                    ->button()
+                    ->label('Filter')
+                    ->icon('heroicon-o-funnel')
+            )
+            ->persistFiltersInSession()
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\EditAction::make()
+                    ->label('Edit Data')
+                    ->button()
+                    ->color('warning')
+                    ->icon(null),
+                Tables\Actions\DeleteAction::make()
+                    ->label('Hapus')
+                    ->button()
+                    ->color('danger')
+                    ->icon(null),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
-            ]);
-    }
-
-    public static function getRelations(): array
-    {
-        return [
-            //
-        ];
+            ->bulkActions([]);
     }
 
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListIbus::route('/'),
+            'index'  => Pages\ListIbus::route('/'),
             'create' => Pages\CreateIbu::route('/create'),
-            'edit' => Pages\EditIbu::route('/{record}/edit'),
+            'edit'   => Pages\EditIbu::route('/{record}/edit'),
         ];
     }
 }

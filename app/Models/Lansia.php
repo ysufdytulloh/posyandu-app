@@ -16,6 +16,7 @@ class Lansia extends Model
         'tgl_lahir', 'alamat', 'no_hp', 'riwayat_penyakit',
     ];
 
+    protected $table = 'lansia';
     protected $casts = ['tgl_lahir' => 'date'];
 
     public function posyandu(): BelongsTo    { return $this->belongsTo(Posyandu::class); }

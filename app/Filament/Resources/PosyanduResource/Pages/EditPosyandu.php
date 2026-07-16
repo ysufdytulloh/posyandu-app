@@ -3,17 +3,24 @@
 namespace App\Filament\Resources\PosyanduResource\Pages;
 
 use App\Filament\Resources\PosyanduResource;
-use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
 class EditPosyandu extends EditRecord
 {
     protected static string $resource = PosyanduResource::class;
 
-    protected function getHeaderActions(): array
+    protected function getRedirectUrl(): string
+    {
+        return $this->getResource()::getUrl('index');
+    }
+
+    protected function getFormActions(): array
     {
         return [
-            Actions\DeleteAction::make(),
+            $this->getSaveFormAction()
+                ->label('Simpan Data'),
+            $this->getCancelFormAction()
+                ->label('Batal'),
         ];
     }
 }

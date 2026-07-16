@@ -21,31 +21,54 @@ class JenisPmtResource extends Resource
     protected static ?string $pluralModelLabel = 'Data Jenis PMT';
     protected static ?int $navigationSort = 2;
     public static function form(Form $form): Form
-    {
-        return $form
-            ->schema([
-                //
-            ]);
-    }
+{
+    return $form
+        ->schema([
+            Forms\Components\Section::make('Informasi PMT')
+                ->schema([
+                    Forms\Components\TextInput::make('nama')
+                        ->label('Nama PMT')
+                        ->required()
+                        ->maxLength(100),
+                    Forms\Components\TextInput::make('satuan')
+                        ->label('Satuan')
+                        ->required()
+                        ->placeholder('Contoh: bungkus, kaleng, kg')
+                        ->maxLength(50),
+                    Forms\Components\Textarea::make('keterangan')
+                        ->label('Keterangan')
+                        ->rows(3)
+                        ->columnSpanFull(),
+                ])->columns(2),
+        ]);
+}
 
     public static function table(Table $table): Table
-    {
-        return $table
-            ->columns([
-                //
-            ])
-            ->filters([
-                //
-            ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
-            ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
-            ]);
-    }
+{
+    return $table
+        ->columns([
+            Tables\Columns\TextColumn::make('nama')
+                ->label('Nama PMT')
+                ->searchable()
+                ->sortable(),
+            Tables\Columns\TextColumn::make('satuan')
+                ->label('Satuan')
+                ->badge()
+                ->color('success')
+                ->sortable(),
+        ])
+        ->defaultSort('nama')
+        ->searchPlaceholder('Cari PMT...')
+        ->filters([])
+        ->actions([
+            Tables\Actions\EditAction::make()
+                ->label('Edit Data')
+                ->button()
+                ->color('warning')
+                ->icon(null),
+        ])
+        ->bulkActions([]);
+}
 
     public static function getRelations(): array
     {

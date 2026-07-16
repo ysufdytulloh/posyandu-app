@@ -21,32 +21,69 @@ class JenisImunisasiResource extends Resource
     protected static ?string $pluralModelLabel = 'Data Jenis Imunisasi';
     protected static ?int $navigationSort = 1;
 
-    public static function form(Form $form): Form
-    {
-        return $form
-            ->schema([
-                //
-            ]);
-    }
+   public static function form(Form $form): Form
+{
+    return $form
+        ->schema([
+            Forms\Components\Section::make('Informasi Imunisasi')
+                ->schema([
+                    Forms\Components\TextInput::make('nama')
+                        ->label('Nama Imunisasi')
+                        ->required()
+                        ->maxLength(100),
+                    Forms\Components\TextInput::make('kode')
+                        ->label('Kode')
+                        ->required()
+                        ->unique(ignoreRecord: true)
+                        ->maxLength(20)
+                        ->placeholder('Contoh: BCG, DPT1, MR'),
+                    Forms\Components\TextInput::make('usia_rekomendasi')
+                        ->label('Usia Rekomendasi')
+                        ->placeholder('Contoh: 0 bulan, 2 bulan')
+                        ->maxLength(50),
+                    Forms\Components\Textarea::make('keterangan')
+                        ->label('Keterangan')
+                        ->rows(3)
+                        ->columnSpanFull(),
+                ])->columns(2),
+        ]);
+}
 
     public static function table(Table $table): Table
-    {
-        return $table
-            ->columns([
-                //
-            ])
-            ->filters([
-                //
-            ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
-            ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
-            ]);
-    }
+{
+    return $table
+        ->columns([
+            Tables\Columns\TextColumn::make('kode')
+                ->label('Kode')
+                ->badge()
+                ->color('primary')
+                ->searchable()
+                ->sortable(),
+            Tables\Columns\TextColumn::make('nama')
+                ->label('Nama Imunisasi')
+                ->searchable()
+                ->sortable(),
+            Tables\Columns\TextColumn::make('usia_rekomendasi')
+                ->label('Usia Rekomendasi')
+                ->icon('heroicon-o-clock')
+                ->sortable(),
+            Tables\Columns\TextColumn::make('created_at')
+                ->label('Ditambahkan')
+                ->dateTime('d/m/Y')
+                ->sortable()
+        ])
+        ->defaultSort('kode')
+        ->searchPlaceholder('Cari imunisasi...')
+        ->filters([])
+        ->actions([
+            Tables\Actions\EditAction::make()
+                ->label('Edit Data')
+                ->icon(null)
+                ->button()
+                ->color('warning'),
+        ])
+        ->bulkActions([]);
+}
 
     public static function getRelations(): array
     {

@@ -24,6 +24,11 @@ class TimbangBalita extends Model
         'tinggi_cm'   => 'float',
     ];
 
+    protected static function booted(): void
+    {
+        static::observe(\App\Observers\TimbangBalitaObserver::class);
+    }
+
     public function anak(): BelongsTo      { return $this->belongsTo(Anak::class); }
     public function posyandu(): BelongsTo  { return $this->belongsTo(Posyandu::class); }
     public function kader(): BelongsTo     { return $this->belongsTo(User::class, 'kader_id'); }

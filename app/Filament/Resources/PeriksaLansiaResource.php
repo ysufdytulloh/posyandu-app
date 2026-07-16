@@ -3,61 +3,130 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\PeriksaLansiaResource\Pages;
-use App\Filament\Resources\PeriksaLansiaResource\RelationManagers;
 use App\Models\PeriksaLansia;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class PeriksaLansiaResource extends Resource
 {
-    protected static ?string $navigationLabel = 'Pemeriksaan Lansia';
-    protected static ?string $modelLabel = 'Pemeriksaan Lansia';
+    protected static ?string $model            = PeriksaLansia::class;
+    protected static ?string $navigationLabel  = 'Pemeriksaan Lansia';
+    protected static ?string $modelLabel       = 'Data Pemeriksaan Lansia';
     protected static ?string $pluralModelLabel = 'Data Pemeriksaan Lansia';
-    protected static ?string $navigationGroup = 'Transaksi';
-    protected static ?int $navigationSort = 4;
+    protected static ?string $navigationGroup  = 'Transaksi';
+    protected static ?int    $navigationSort   = 4;
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\Select::make('lansia_id')
-                    ->relationship('lansia', 'id')
-                    ->required(),
-                Forms\Components\Select::make('posyandu_id')
-                    ->relationship('posyandu', 'id')
-                    ->required(),
-                Forms\Components\Select::make('kader_id')
-                    ->relationship('kader', 'name')
-                    ->required(),
-                Forms\Components\DatePicker::make('tgl_periksa')
-                    ->required(),
-                Forms\Components\TextInput::make('berat_kg')
-                    ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('tinggi_cm')
-                    ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('imt')
-                    ->numeric(),
-                Forms\Components\TextInput::make('tensi_sistol')
-                    ->numeric(),
-                Forms\Components\TextInput::make('tensi_diastol')
-                    ->numeric(),
-                Forms\Components\TextInput::make('gula_darah')
-                    ->numeric(),
-                Forms\Components\TextInput::make('kolesterol')
-                    ->numeric(),
-                Forms\Components\TextInput::make('asam_urat')
-                    ->numeric(),
-                Forms\Components\TextInput::make('lingkar_perut')
-                    ->numeric(),
-                Forms\Components\Textarea::make('keluhan')
-                    ->columnSpanFull(),
+                Forms\Components\Section::make('Informasi Pemeriksaan')
+                    ->schema([
+                        Forms\Components\Select::make('posyandu_id')
+                            ->label('Posyandu')
+                            ->relationship('posyandu', 'nama')
+                            ->searchable()
+                            ->preload()
+                            ->required()
+                            ->live()
+                            ->afterStateUpdated(function (Forms\Set $set) {
+                                $set('lansia_id', null);
+                                $set('kader_id', null);
+                            }),
+                        Forms\Components\Select::make('lansia_id')
+                            ->label('Nama Lansia')
+                            ->options(fn (Forms\Get $get) =>
+                                \App\Models\Lansia::where('posyandu_id', $get('posyandu_id'))
+                                    ->pluck('nama', 'id')
+                            )
+                            ->searchable()
+                            ->required()
+                            ->live()
+                            ->helperText('Pilih posyandu terlebih dahulu'),
+                        Forms\Components\Select::make('kader_id')
+                            ->label('Kader')
+                            ->options(fn (Forms\Get $get) =>
+                                \App\Models\User::where('role', 'kader')
+                                    ->where('posyandu_id', $get('posyandu_id'))
+                                    ->pluck('name', 'id')
+                            )
+                            ->searchable()
+                            ->required()
+                            ->live()
+                            ->helperText('Pilih posyandu terlebih dahulu'),
+                        Forms\Components\DatePicker::make('tgl_periksa')
+                            ->label('Tanggal Periksa')
+                            ->displayFormat('d/m/Y')
+                            ->maxDate(now())
+                            ->required()
+                            ->default(now()),
+                    ])->columns(2),
+
+                Forms\Components\Section::make('Antropometri')
+                    ->schema([
+                        Forms\Components\TextInput::make('berat_kg')
+                            ->label('Berat Badan (kg)')
+                            ->numeric()
+                            ->step(0.1)
+                            ->suffix('kg')
+                            ->required(),
+                        Forms\Components\TextInput::make('tinggi_cm')
+                            ->label('Tinggi Badan (cm)')
+                            ->numeric()
+                            ->step(0.1)
+                            ->suffix('cm')
+                            ->required(),
+                        Forms\Components\TextInput::make('imt')
+                            ->label('IMT (otomatis)')
+                            ->numeric()
+                            ->suffix('kg/m²')
+                            ->disabled()
+                            ->dehydrated(false)
+                            ->helperText('Dihitung otomatis saat disimpan'),
+                        Forms\Components\TextInput::make('lingkar_perut')
+                            ->label('Lingkar Perut (cm)')
+                            ->numeric()
+                            ->step(0.1)
+                            ->suffix('cm'),
+                    ])->columns(2),
+
+                Forms\Components\Section::make('Vital Sign')
+                    ->schema([
+                        Forms\Components\TextInput::make('tensi_sistol')
+                            ->label('Tensi Sistol')
+                            ->numeric()
+                            ->suffix('mmHg'),
+                        Forms\Components\TextInput::make('tensi_diastol')
+                            ->label('Tensi Diastol')
+                            ->numeric()
+                            ->suffix('mmHg'),
+                        Forms\Components\TextInput::make('gula_darah')
+                            ->label('Gula Darah Sewaktu')
+                            ->numeric()
+                            ->step(0.1)
+                            ->suffix('mg/dL'),
+                        Forms\Components\TextInput::make('kolesterol')
+                            ->label('Kolesterol')
+                            ->numeric()
+                            ->step(0.1)
+                            ->suffix('mg/dL'),
+                        Forms\Components\TextInput::make('asam_urat')
+                            ->label('Asam Urat')
+                            ->numeric()
+                            ->step(0.1)
+                            ->suffix('mg/dL'),
+                    ])->columns(2),
+
+                Forms\Components\Section::make('Catatan')
+                    ->schema([
+                        Forms\Components\Textarea::make('keluhan')
+                            ->label('Keluhan')
+                            ->rows(3)
+                            ->columnSpanFull(),
+                    ]),
             ]);
     }
 
@@ -65,84 +134,79 @@ class PeriksaLansiaResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('lansia.id')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('posyandu.id')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('kader.name')
-                    ->numeric()
-                    ->sortable(),
+                Tables\Columns\TextColumn::make('posyandu.nama')
+                    ->label('Posyandu')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('lansia.nama')
+                    ->label('Nama Lansia')
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('tgl_periksa')
-                    ->date()
-                    ->sortable(),
+                    ->label('Tgl Periksa')
+                    ->date('d/m/Y'),
                 Tables\Columns\TextColumn::make('berat_kg')
-                    ->numeric()
-                    ->sortable(),
+                    ->label('Berat (kg)')
+                    ->numeric(decimalPlaces: 1)
+                    ->suffix(' kg'),
                 Tables\Columns\TextColumn::make('tinggi_cm')
-                    ->numeric()
-                    ->sortable(),
+                    ->label('Tinggi (cm)')
+                    ->numeric(decimalPlaces: 1)
+                    ->suffix(' cm'),
                 Tables\Columns\TextColumn::make('imt')
-                    ->numeric()
-                    ->sortable(),
+                    ->label('IMT')
+                    ->numeric(decimalPlaces: 1)
+                    ->badge()
+                    ->color(fn (?string $state): string => match(true) {
+                        $state === null         => 'gray',
+                        (float)$state < 18.5   => 'warning',
+                        (float)$state <= 24.9  => 'success',
+                        (float)$state <= 29.9  => 'warning',
+                        default                => 'danger',
+                    }),
                 Tables\Columns\TextColumn::make('tensi_sistol')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('tensi_diastol')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('gula_darah')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('kolesterol')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('asam_urat')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('lingkar_perut')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('deleted_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->label('Tensi')
+                    ->formatStateUsing(fn ($record) =>
+                        $record->tensi_sistol && $record->tensi_diastol
+                            ? $record->tensi_sistol . '/' . $record->tensi_diastol
+                            : '-'
+                    ),
+                Tables\Columns\TextColumn::make('kader.name')
+                    ->label('Kader'),
             ])
+            ->defaultSort('tgl_periksa', 'desc')
+            ->searchPlaceholder('Cari nama lansia...')
             ->filters([
-                //
+                Tables\Filters\SelectFilter::make('posyandu_id')
+                    ->label('Posyandu')
+                    ->relationship('posyandu', 'nama'),
             ])
+            ->filtersTriggerAction(
+                fn (Tables\Actions\Action $action) => $action
+                    ->button()
+                    ->label('Filter')
+                    ->icon('heroicon-o-funnel')
+            )
+            ->persistFiltersInSession()
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\EditAction::make()
+                    ->label('Edit Data')
+                    ->button()
+                    ->color('warning')
+                    ->icon(null),
+                Tables\Actions\DeleteAction::make()
+                    ->label('Hapus')
+                    ->button()
+                    ->color('danger')
+                    ->icon(null),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
-            ]);
-    }
-
-    public static function getRelations(): array
-    {
-        return [
-            //
-        ];
+            ->bulkActions([]);
     }
 
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListPeriksaLansias::route('/'),
+            'index'  => Pages\ListPeriksaLansias::route('/'),
             'create' => Pages\CreatePeriksaLansia::route('/create'),
-            'edit' => Pages\EditPeriksaLansia::route('/{record}/edit'),
+            'edit'   => Pages\EditPeriksaLansia::route('/{record}/edit'),
         ];
     }
 }

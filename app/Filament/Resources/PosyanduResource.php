@@ -3,48 +3,65 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\PosyanduResource\Pages;
-use App\Filament\Resources\PosyanduResource\RelationManagers;
 use App\Models\Posyandu;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Tables\Enums\FiltersLayout;
 
 class PosyanduResource extends Resource
 {
-    protected static ?string $navigationLabel = 'Data Posyandu';
-    protected static ?string $modelLabel = 'Posyandu';
-    protected static ?string $pluralModelLabel = 'Data Posyandu';
-    protected static ?string $navigationGroup = 'Master Data';
-    protected static ?int $navigationSort = 1;
+    protected static ?string $model = Posyandu::class;
+    protected static ?string $navigationLabel   = 'Data Posyandu';
+    protected static ?string $modelLabel        = 'Data Posyandu';
+    protected static ?string $pluralModelLabel  = 'Data Posyandu';
+    protected static ?string $navigationGroup   = 'Master Data';
+    protected static ?int    $navigationSort    = 1;
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('nama')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\Textarea::make('alamat')
-                    ->required()
-                    ->columnSpanFull(),
-                Forms\Components\TextInput::make('kecamatan')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('kelurahan')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('rt')
-                    ->maxLength(5),
-                Forms\Components\TextInput::make('rw')
-                    ->maxLength(5),
-                Forms\Components\TextInput::make('logo')
-                    ->maxLength(255),
-                Forms\Components\Toggle::make('is_active')
-                    ->required(),
+                Forms\Components\Section::make('Informasi Posyandu')
+                    ->schema([
+                        Forms\Components\TextInput::make('nama')
+                            ->label('Nama Posyandu')
+                            ->required()
+                            ->maxLength(255),
+                        Forms\Components\Textarea::make('alamat')
+                            ->label('Alamat')
+                            ->required()
+                            ->rows(3)
+                            ->columnSpanFull(),
+                        Forms\Components\TextInput::make('kecamatan')
+                            ->label('Kecamatan')
+                            ->required()
+                            ->maxLength(255),
+                        Forms\Components\TextInput::make('kelurahan')
+                            ->label('Kelurahan')
+                            ->required()
+                            ->maxLength(255),
+                        Forms\Components\TextInput::make('rt')
+                            ->label('RT')
+                            ->maxLength(5),
+                        Forms\Components\TextInput::make('rw')
+                            ->label('RW')
+                            ->maxLength(5),
+                    ])->columns(2),
+
+                Forms\Components\Section::make('Pengaturan')
+                    ->schema([
+                        Forms\Components\FileUpload::make('logo')
+                            ->label('Logo Posyandu')
+                            ->image()
+                            ->directory('logo-posyandu')
+                            ->columnSpanFull(),
+                        Forms\Components\Toggle::make('is_active')
+                            ->label('Aktif')
+                            ->default(true),
+                    ]),
             ]);
     }
 
@@ -53,54 +70,67 @@ class PosyanduResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('nama')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('kecamatan')
+                    ->label('Nama Posyandu')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('kelurahan')
+                    ->label('Kelurahan')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('kecamatan')
+                    ->label('Kecamatan')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('rt')
-                    ->searchable(),
+                    ->label('RT'),
                 Tables\Columns\TextColumn::make('rw')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('logo')
-                    ->searchable(),
+                    ->label('RW'),
                 Tables\Columns\IconColumn::make('is_active')
+                    ->label('Status')
                     ->boolean(),
                 Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->label('Dibuat')
+                    ->dateTime('d/m/Y')
+                    ->hidden(),
+                Tables\Columns\TextColumn::make('is_active')
+                    ->label('Status')
+                    ->badge()
+                    ->formatStateUsing(fn (bool $state): string => $state ? 'Aktif' : 'Tidak Aktif')
+                    ->color(fn (bool $state): string => $state ? 'success' : 'danger'),
             ])
+            ->defaultSort('nama')
+            ->searchPlaceholder('Cari posyandu...')
             ->filters([
-                //
+                Tables\Filters\TernaryFilter::make('is_active')
+                    ->label('Status')
+                    ->trueLabel('Aktif')
+                    ->falseLabel('Tidak Aktif'),
             ])
+            ->filtersTriggerAction(
+                fn (Tables\Actions\Action $action) => $action
+                    ->button()
+                    ->label('Filter')
+                    ->icon('heroicon-o-funnel')
+            )
+            ->persistFiltersInSession()
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\EditAction::make()
+                    ->label('Edit Data')
+                    ->button()
+                    ->color('warning')
+                    ->icon(null),
+                Tables\Actions\DeleteAction::make()
+                    ->label('Hapus')
+                    ->button()
+                    ->color('danger')
+                    ->icon(null),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
-            ]);
-    }
-
-    public static function getRelations(): array
-    {
-        return [
-            //
-        ];
+            ->bulkActions([]);
     }
 
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListPosyandus::route('/'),
+            'index'  => Pages\ListPosyandus::route('/'),
             'create' => Pages\CreatePosyandu::route('/create'),
-            'edit' => Pages\EditPosyandu::route('/{record}/edit'),
+            'edit'   => Pages\EditPosyandu::route('/{record}/edit'),
         ];
     }
 }

@@ -17,6 +17,8 @@ class Imunisasi extends Model
 
     protected $casts = ['tgl_imunisasi' => 'date'];
 
+    protected $table = 'imunisasi';
+
     public function anak(): BelongsTo            { return $this->belongsTo(Anak::class); }
     public function jenisImunisasi(): BelongsTo  { return $this->belongsTo(JenisImunisasi::class); }
     public function kader(): BelongsTo           { return $this->belongsTo(User::class, 'kader_id'); }
