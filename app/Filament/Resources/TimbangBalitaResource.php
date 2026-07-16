@@ -164,9 +164,11 @@ class TimbangBalitaResource extends Resource
             ->actions([
                 Tables\Actions\DeleteAction::make()
                     ->label('Hapus')
-                    ->button()
+                    ->button()          // Membentuk kotak tombol
+                    ->outlined()        // <-- Menambahkan BORDER (garis tepi) merah
+                    ->hiddenLabel()     // Sembunyikan teks "Hapus", sisakan icon saja
                     ->color('danger')
-                    ->icon(null),
+                    ->icon('heroicon-o-trash'),
             ])
             ->bulkActions([]);
     }

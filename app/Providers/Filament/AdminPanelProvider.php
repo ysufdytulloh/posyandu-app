@@ -31,7 +31,11 @@ class AdminPanelProvider extends PanelProvider
             ->login(Login::class)
             ->unsavedChangesAlerts()
             ->brandName('SIP Posyandu')
-            ->viteTheme('resources/css/filament/admin/theme.css')
+            ->sidebarCollapsibleOnDesktop()
+            ->viteTheme([
+                'resources/css/filament/admin/theme.css',
+                'resources/js/app.js',
+            ])
             ->colors([
                 'primary' => Color::hex('#059669'),
             ])

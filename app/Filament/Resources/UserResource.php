@@ -89,6 +89,7 @@ class UserResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->recordUrl(null)
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->label('Nama')
@@ -146,12 +147,14 @@ class UserResource extends Resource
                     ->label('Edit Data')
                     ->button()
                     ->color('warning')
-                    ->icon(null),
+                    ->icon(null)
+                    ->hidden(fn ($record) => $record->role === 'admin_desa'),
                 Tables\Actions\DeleteAction::make()
                     ->label('Hapus')
                     ->button()
                     ->color('danger')
-                    ->icon(null),
+                    ->icon(null)
+                    ->hidden(fn ($record) => $record->role === 'admin_desa'),
             ])
             ->bulkActions([]);
     }

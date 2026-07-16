@@ -5,7 +5,7 @@
 
         {{-- KIRI: Foto --}}
         <div class="hidden lg:block relative w-[48%] min-h-screen bg-cover bg-center"
-             style="background-image: url('{{ asset('images/unnamed.webp') }}');">
+             style="background-image: url('{{ asset('images/kepanjangan-posyandu-adalah.jpg.webp') }}');">
 
             {{-- Overlay --}}
             <div class="absolute inset-0"
@@ -18,7 +18,7 @@
                 <div class="flex items-center gap-2 mb-3">
                     <div class="w-1.5 h-1.5 bg-emerald-400 rounded-full"></div>
                     <span class="text-[0.68rem] font-semibold tracking-widest uppercase opacity-70">
-                        SIP Posyandu ·
+                        SIP Posyandu · 2026
                     </span>
                 </div>
 

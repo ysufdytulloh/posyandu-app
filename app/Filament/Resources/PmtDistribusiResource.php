@@ -137,8 +137,7 @@ class PmtDistribusiResource extends Resource
                     }),
                 Tables\Columns\TextColumn::make('tgl_distribusi')
                     ->label('Tgl Distribusi')
-                    ->date('d/m/Y')
-                    ->sortable(),
+                    ->date('d/m/Y'),
                 Tables\Columns\TextColumn::make('jumlah')
                     ->label('Jumlah')
                     ->formatStateUsing(fn ($record) => $record->jumlah . ' ' . $record->satuan),

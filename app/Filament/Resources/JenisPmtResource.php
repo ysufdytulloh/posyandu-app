@@ -49,13 +49,11 @@ class JenisPmtResource extends Resource
         ->columns([
             Tables\Columns\TextColumn::make('nama')
                 ->label('Nama PMT')
-                ->searchable()
-                ->sortable(),
+                ->searchable(),
             Tables\Columns\TextColumn::make('satuan')
                 ->label('Satuan')
                 ->badge()
-                ->color('success')
-                ->sortable(),
+                ->color('success'),
         ])
         ->defaultSort('nama')
         ->searchPlaceholder('Cari PMT...')

@@ -4,6 +4,281 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
+/* ── FONT ── */
 * {
   font-family: 'Inter', sans-serif !important;
+}
+
+/* ── SIDEBAR ── */
+.fi-sidebar {
+  background: #ffffff !important;
+  border-right: 1px solid #f1f5f9 !important;
+}
+
+.fi-sidebar-nav-group-label {
+  color: #94a3b8 !important;
+  font-size: 0.65rem !important;
+  letter-spacing: 0.1em !important;
+  text-transform: uppercase !important;
+  font-weight: 600 !important;
+}
+
+.fi-sidebar-item-label {
+  color: #64748b !important;
+  font-weight: 400 !important;
+  font-size: 0.875rem !important;
+}
+
+.fi-sidebar-item-active .fi-sidebar-item-label {
+  color: #059669 !important;
+  font-weight: 600 !important;
+}
+
+.fi-sidebar-item-active .fi-sidebar-item-button {
+  background: #f0fdf4 !important;
+  border-radius: 0.5rem !important;
+}
+
+.fi-sidebar-item-button:hover {
+  background: #f8fafc !important;
+  border-radius: 0.5rem !important;
+}
+
+.fi-sidebar-header {
+  border-bottom: 1px solid #f1f5f9 !important;
+}
+
+.fi-logo {
+  color: #059669 !important;
+  font-weight: 700 !important;
+}
+
+.fi-sidebar-nav-group-icon {
+  color: #94a3b8 !important;
+}
+
+.fi-sidebar-item-active .fi-sidebar-item-icon {
+  color: #059669 !important;
+}
+
+/* ── TOPBAR ── */
+.fi-topbar {
+  background: #ffffff !important;
+  border-bottom: 1px solid #f1f5f9 !important;
+  box-shadow: none !important;
+}
+
+/* ── MAIN CONTENT ── */
+.fi-main {
+  background: #f8fafc !important;
+}
+
+/* ── STAT CARDS ── */
+.fi-wi-stats-overview-stat {
+  border-radius: 1rem !important;
+  border: 1px solid #f1f5f9 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06) !important;
+  background: #ffffff !important;
+}
+
+.fi-wi-stats-overview-stat-value {
+  font-size: 1.875rem !important;
+  font-weight: 700 !important;
+  color: #0f172a !important;
+}
+
+.fi-wi-stats-overview-stat-label {
+  font-size: 0.8rem !important;
+  color: #64748b !important;
+  font-weight: 500 !important;
+}
+
+/* ── CHARTS ── */
+.fi-wi-chart {
+  border-radius: 1rem !important;
+  border: 1px solid #f1f5f9 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06) !important;
+  background: #ffffff !important;
+}
+
+/* ── TABLE ── */
+.fi-ta-ctn {
+  border-radius: 1rem !important;
+  border: 1px solid #f1f5f9 !important;
+  background: #ffffff !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06) !important;
+}
+
+.fi-ta-header-cell {
+  font-weight: 600 !important;
+  font-size: 0.72rem !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.06em !important;
+  color: #94a3b8 !important;
+}
+
+/* ── SECTION/CARD ── */
+.fi-section {
+  border-radius: 1rem !important;
+  border: 1px solid #f1f5f9 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06) !important;
+  background: #ffffff !important;
+}
+
+/* ── PAGE HEADER ── */
+.fi-page-header-heading {
+  font-weight: 700 !important;
+  font-size: 1.375rem !important;
+  color: #0f172a !important;
+}
+
+/* ── BUTTONS ── */
+.fi-btn-color-primary {
+  background: #059669 !important;
+  border-color: #059669 !important;
+  border-radius: 0.5rem !important;
+  font-weight: 500 !important;
+}
+
+.fi-btn-color-primary:hover {
+  background: #047857 !important;
+  border-color: #047857 !important;
+}
+
+/* ── BADGE ── */
+.fi-badge {
+  font-weight: 500 !important;
+  font-size: 0.72rem !important;
+  border-radius: 0.375rem !important;
+}
+
+/* ── INPUT ── */
+.fi-input-wrp {
+  border-radius: 0.5rem !important;
+  border-color: #e2e8f0 !important;
+  background: #ffffff !important;
+}
+
+.fi-input-wrp:focus-within {
+  border-color: #059669 !important;
+  box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1) !important;
+}
+
+/* ── SELECT ── */
+.fi-select-input {
+  border-radius: 0.5rem !important;
+}
+
+/* ── BREADCRUMB ── */
+.fi-breadcrumbs-item-label {
+  color: #94a3b8 !important;
+  font-size: 0.8rem !important;
+}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar {
+  width: 4px !important;
+  height: 4px !important;
+}
+
+::-webkit-scrollbar-track {
+  background: #f8fafc !important;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #e2e8f0 !important;
+  border-radius: 9999px !important;
+}
+/* ── TOPBAR ── */
+.fi-topbar {
+  background: #ffffff !important;
+  border-bottom: 1px solid #f1f5f9 !important;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06) !important;
+}
+
+/* ── BUTTON WARNING (Edit) ── */
+.fi-btn-color-warning {
+  background: #f59e0b !important;
+  border-color: #f59e0b !important;
+  color: #ffffff !important;
+  border-radius: 0.375rem !important;
+}
+
+.fi-btn-color-warning:hover {
+  background: #d97706 !important;
+  border-color: #d97706 !important;
+}
+
+/* ── BUTTON DANGER (Hapus) ── */
+.fi-btn-color-danger {
+  background: #ef4444 !important;
+  border-color: #ef4444 !important;
+  color: #ffffff !important;
+  border-radius: 0.375rem !important;
+}
+
+.fi-btn-color-danger:hover {
+  background: #dc2626 !important;
+  border-color: #dc2626 !important;
+}
+
+/* ── TABLE BORDER ── */
+.fi-ta-content {
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 0.875rem !important;
+  overflow: hidden !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05) !important;
+}
+
+/* ── FORM SECTION SHADOW ── */
+.fi-section-content-ctn {
+  background: #ffffff !important;
+}
+
+.fi-section {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05) !important;
+  border: 1px solid #e2e8f0 !important;
+}
+
+/* ── TABLE ACTIONS ── */
+.fi-ta-actions {
+  white-space: nowrap !important;
+  min-width: fit-content !important;
+}
+
+.fi-ta-col-actions {
+  width: auto !important;
+  min-width: fit-content !important;
+}
+
+/* ── SECTION ── */
+.fi-section {
+    border-radius: 0.75rem !important;
+    border: 1px solid #e2e8f0 !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05) !important;
+    background: #ffffff !important;
+    overflow: visible !important;
+}
+
+/* Fix dropdown yang terpotong — hanya di wrapper konten */
+.fi-section-content-ctn,
+.fi-section-content {
+    overflow: visible !important;
+    border-radius: 0 0 0.75rem 0.75rem !important;
+}
+
+/* Pastikan header section juga rounded atas */
+.fi-section-header {
+    border-radius: 0.75rem 0.75rem 0 0 !important;
+}
+
+/* Background putih di content agar border radius terlihat */
+.fi-section-content {
+    background: #ffffff !important;
+}
+
+/* Tabel tetap overflow hidden agar rounded benar */
+.fi-ta-content {
+    overflow: hidden !important;
+    border-radius: 0.75rem !important;
 }

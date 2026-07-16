@@ -57,20 +57,16 @@ class JenisImunisasiResource extends Resource
                 ->label('Kode')
                 ->badge()
                 ->color('primary')
-                ->searchable()
-                ->sortable(),
+                ->searchable(),
             Tables\Columns\TextColumn::make('nama')
                 ->label('Nama Imunisasi')
-                ->searchable()
-                ->sortable(),
+                ->searchable(),
             Tables\Columns\TextColumn::make('usia_rekomendasi')
                 ->label('Usia Rekomendasi')
-                ->icon('heroicon-o-clock')
-                ->sortable(),
+                ->icon('heroicon-o-clock'),
             Tables\Columns\TextColumn::make('created_at')
                 ->label('Ditambahkan')
                 ->dateTime('d/m/Y')
-                ->sortable()
         ])
         ->defaultSort('kode')
         ->searchPlaceholder('Cari imunisasi...')
