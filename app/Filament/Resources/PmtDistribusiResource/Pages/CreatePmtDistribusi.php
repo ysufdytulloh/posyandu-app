@@ -1,0 +1,12 @@
+<?php
+
+namespace App\Filament\Resources\PmtDistribusiResource\Pages;
+
+use App\Filament\Resources\PmtDistribusiResource;
+use Filament\Actions;
+use Filament\Resources\Pages\CreateRecord;
+
+class CreatePmtDistribusi extends CreateRecord
+{
+    protected static string $resource = PmtDistribusiResource::class;
+}
