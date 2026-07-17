@@ -17,7 +17,7 @@ class TimbangBalitaResource extends Resource
     protected static ?string $model            = TimbangBalita::class;
     protected static ?string $navigationLabel  = 'Timbang Balita';
     protected static ?string $modelLabel       = 'Data Timbang Balita';
-    protected static ?string $pluralModelLabel = 'Data Timbang Balita';
+    protected static ?string $pluralModelLabel = 'Timbang Balita';
     protected static ?string $navigationGroup  = 'Transaksi';
     protected static ?int    $navigationSort   = 1;
 

@@ -4,7 +4,6 @@
 <x-filament::section>
     <x-slot name="heading">Grafik KMS — Kartu Menuju Sehat</x-slot>
     <x-slot name="description">Kurva pertumbuhan balita berdasarkan standar WHO/Kemenkes</x-slot>
-
     {{ $this->form }}
 </x-filament::section>
 
@@ -25,12 +24,14 @@
 <x-filament::section>
     <x-slot name="heading">Informasi Anak</x-slot>
 
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+    <div class="grid grid-cols-2 md:grid-cols-3 gap-6">
         @foreach([
-            ['label' => 'Nama Anak',     'value' => $chart['anak']['nama'],  'icon' => 'heroicon-o-user', 'color' => 'text-primary-600 bg-primary-50'],
-            ['label' => 'Jenis Kelamin', 'value' => $chart['anak']['jk'],    'icon' => 'heroicon-o-identification', 'color' => 'text-blue-600 bg-blue-50'],
-            ['label' => 'Tanggal Lahir', 'value' => $chart['anak']['lahir'], 'icon' => 'heroicon-o-calendar', 'color' => 'text-amber-600 bg-amber-50'],
-            ['label' => 'Nama Ibu',      'value' => $chart['anak']['ibu'],   'icon' => 'heroicon-o-heart', 'color' => 'text-rose-600 bg-rose-50'],
+            ['label' => 'Nama Anak',     'value' => $chart['anak']['nama'],     'icon' => 'heroicon-o-user',            'color' => 'text-primary-600 bg-primary-50'],
+            ['label' => 'Jenis Kelamin', 'value' => $chart['anak']['jk'],       'icon' => 'heroicon-o-identification',  'color' => 'text-blue-600 bg-blue-50'],
+            ['label' => 'Tanggal Lahir', 'value' => $chart['anak']['lahir'],    'icon' => 'heroicon-o-calendar',        'color' => 'text-amber-600 bg-amber-50'],
+            ['label' => 'Nama Ibu',      'value' => $chart['anak']['ibu'],      'icon' => 'heroicon-o-heart',           'color' => 'text-rose-600 bg-rose-50'],
+            ['label' => 'Posyandu',      'value' => $chart['anak']['posyandu'], 'icon' => 'heroicon-o-building-office', 'color' => 'text-teal-600 bg-teal-50'],
+            ['label' => 'Kader',         'value' => $chart['anak']['kader'],    'icon' => 'heroicon-o-users',           'color' => 'text-violet-600 bg-violet-50'],
         ] as $info)
         <div class="flex items-start gap-3">
             <div class="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 {{ $info['color'] }}">
@@ -45,9 +46,6 @@
     </div>
 </x-filament::section>
 
-<script src="https://unpkg.com/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-
-{{-- CHART --}}
 {{-- CHART --}}
 <x-filament::section>
     <x-slot name="heading">Grafik Pertumbuhan BB/U</x-slot>
@@ -57,9 +55,7 @@
         x-data="{
             chart: null,
             init() {
-                this.$nextTick(() => {
-                    this.drawChart();
-                });
+                this.$nextTick(() => { this.drawChart(); });
             },
             drawChart() {
                 const canvas = document.getElementById('kmsChart-{{ $this->anak_id }}');
@@ -108,6 +104,7 @@
                     },
                     options: {
                         responsive: true,
+                        maintainAspectRatio: false,
                         interaction: { mode:'index', intersect:false },
                         plugins: {
                             legend: { display:false },
@@ -127,7 +124,7 @@
                             x: { grid:{ color:'#f8fafc' }, ticks:{ font:{ size:11 }, color:'#94a3b8' } },
                             y: {
                                 grid:{ color:'#f8fafc' },
-                                ticks:{ font:{ size:11 }, color:'#94a3b8', callback: v => v + ' kg' },
+                                ticks:{ font:{ size:11 }, color:'#94a3b8', callback: v => v+' kg' },
                                 title:{ display:true, text:'Berat Badan (kg)', color:'#94a3b8', font:{ size:11 } },
                             },
                         },
@@ -143,7 +140,7 @@
 
     {{-- Legend --}}
     <div class="flex flex-wrap gap-x-6 gap-y-2 pt-4 border-t border-gray-100">
-        <div class="flex items-center gap-2"><div class="w-5 h-0.5 bg-red-400 opacity-70" style="border-top: 2px dashed #f87171;"></div><span class="text-xs text-gray-500">-3 SD — Gizi Buruk</span></div>
+        <div class="flex items-center gap-2"><div class="w-5 h-0.5" style="border-top: 2px dashed #f87171;"></div><span class="text-xs text-gray-500">-3 SD — Gizi Buruk</span></div>
         <div class="flex items-center gap-2"><div class="w-5 h-0.5" style="border-top: 2px dashed #fbbf24;"></div><span class="text-xs text-gray-500">-2 SD — Gizi Kurang</span></div>
         <div class="flex items-center gap-2"><div class="w-5 h-0.5 bg-green-500"></div><span class="text-xs text-gray-500">Median — Normal</span></div>
         <div class="flex items-center gap-2"><div class="w-5 h-0.5" style="border-top: 2px dashed #fbbf24;"></div><span class="text-xs text-gray-500">+2 SD — Gizi Lebih</span></div>
@@ -177,7 +174,7 @@
                 <tr class="hover:bg-gray-50/50 transition-colors">
                     <td class="py-3.5 px-6 text-gray-300 text-xs">{{ $i+1 }}</td>
                     <td class="py-3.5 px-6 text-gray-600 text-xs whitespace-nowrap">{{ $t->tgl_periksa->format('d/m/Y') }}</td>
-                    <td class="py-3.5 px-6 text-gray-600 text-xs">{{ $chart['dataPoints'][$i]['x'] }} bulan</td>
+                    <td class="py-3.5 px-6 text-gray-600 text-xs">{{ $chart['dataPoints'][$i]['x'] ?? '-' }} bulan</td>
                     <td class="py-3.5 px-6 font-bold text-gray-700">{{ $t->berat_kg }} kg</td>
                     <td class="py-3.5 px-6 text-gray-600 text-xs">{{ $t->tinggi_cm }} cm</td>
                     <td class="py-3.5 px-6">
@@ -204,95 +201,6 @@
         </table>
     </div>
 </x-filament::section>
-
-@push('scripts')
-<script>
-(function() {
-    const canvasId = 'kmsChart-{{ $this->anak_id }}';
-
-    function drawChart() {
-        const canvas = document.getElementById(canvasId);
-        if (!canvas) { setTimeout(drawChart, 200); return; }
-        if (typeof Chart === 'undefined') { setTimeout(drawChart, 200); return; }
-
-        // Destroy semua instance lama
-        Object.values(Chart.instances || {}).forEach(c => {
-            try { c.destroy(); } catch(e) {}
-        });
-
-        const labels     = @json($chart['labels']);
-        const refUsia    = @json($chart['refUsia']);
-        const dataPoints = @json($chart['dataPoints']);
-        const sd3neg     = @json($chart['sd3neg']);
-        const sd2neg     = @json($chart['sd2neg']);
-        const median     = @json($chart['median']);
-        const sd2pos     = @json($chart['sd2pos']);
-        const sd3pos     = @json($chart['sd3pos']);
-
-        const mappedData = refUsia.map(usia => {
-            const pt = dataPoints.find(p => p.x === usia);
-            return pt ? pt.y : null;
-        });
-
-        new Chart(canvas, {
-            type: 'line',
-            data: {
-                labels,
-                datasets: [
-                    { label:'-3 SD', data:sd3neg, borderColor:'#f87171', borderWidth:1.5, borderDash:[5,5], pointRadius:0, fill:false, tension:0.4 },
-                    { label:'-2 SD', data:sd2neg, borderColor:'#fbbf24', borderWidth:1.5, borderDash:[5,5], pointRadius:0, fill:false, tension:0.4 },
-                    { label:'Median', data:median, borderColor:'#059669', borderWidth:2, pointRadius:0, fill:false, tension:0.4 },
-                    { label:'+2 SD', data:sd2pos, borderColor:'#fbbf24', borderWidth:1.5, borderDash:[5,5], pointRadius:0, fill:false, tension:0.4 },
-                    { label:'+3 SD', data:sd3pos, borderColor:'#f87171', borderWidth:1.5, borderDash:[5,5], pointRadius:0, fill:false, tension:0.4 },
-                    {
-                        label:'Berat Badan Anak',
-                        data: mappedData,
-                        borderColor:'#059669',
-                        backgroundColor:'#059669',
-                        borderWidth:2.5,
-                        pointRadius:6,
-                        pointBackgroundColor:'#059669',
-                        pointBorderColor:'#fff',
-                        pointBorderWidth:2.5,
-                        fill:false,
-                        tension:0.3,
-                        spanGaps:false,
-                    },
-                ],
-            },
-            options: {
-                responsive: true,
-                interaction: { mode:'index', intersect:false },
-                plugins: {
-                    legend: { display:false },
-                    tooltip: {
-                        backgroundColor:'#fff',
-                        titleColor:'#374151',
-                        bodyColor:'#6b7280',
-                        borderColor:'#e5e7eb',
-                        borderWidth:1,
-                        padding:10,
-                        callbacks: {
-                            label: c => c.dataset.label + ': ' + (c.raw !== null ? c.raw + ' kg' : '-'),
-                        }
-                    },
-                },
-                scales: {
-                    x: { grid:{ color:'#f8fafc' }, ticks:{ font:{ size:11 }, color:'#94a3b8' } },
-                    y: {
-                        grid:{ color:'#f8fafc' },
-                        ticks:{ font:{ size:11 }, color:'#94a3b8', callback: v => v+' kg' },
-                        title:{ display:true, text:'Berat Badan (kg)', color:'#94a3b8', font:{ size:11 } },
-                    },
-                },
-            },
-        });
-    }
-
-    drawChart();
-})();
-</script>
-@endpush
 
 @endif
 @endif

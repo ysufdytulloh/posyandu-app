@@ -15,7 +15,7 @@ class PeriksaLansiaResource extends Resource
     protected static ?string $model            = PeriksaLansia::class;
     protected static ?string $navigationLabel  = 'Pemeriksaan Lansia';
     protected static ?string $modelLabel       = 'Data Pemeriksaan Lansia';
-    protected static ?string $pluralModelLabel = 'Data Pemeriksaan Lansia';
+    protected static ?string $pluralModelLabel = 'Pemeriksaan Lansia';
     protected static ?string $navigationGroup  = 'Transaksi';
     protected static ?int    $navigationSort   = 4;
 

@@ -17,8 +17,8 @@ class JenisImunisasiResource extends Resource
 {
     protected static ?string $navigationGroup = 'Pengaturan';
     protected static ?string $navigationLabel = 'Jenis Imunisasi';
-    protected static ?string $modelLabel = 'Jenis Imunisasi';
-    protected static ?string $pluralModelLabel = 'Data Jenis Imunisasi';
+    protected static ?string $modelLabel = 'Data Jenis Imunisasi';
+    protected static ?string $pluralModelLabel = 'Jenis Imunisasi';
     protected static ?int $navigationSort = 1;
 
    public static function form(Form $form): Form

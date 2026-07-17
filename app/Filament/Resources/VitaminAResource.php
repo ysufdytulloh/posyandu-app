@@ -16,7 +16,7 @@ class VitaminAResource extends Resource
     protected static ?string $model            = VitaminA::class;
     protected static ?string $navigationLabel  = 'Vitamin A';
     protected static ?string $modelLabel       = 'Data Vitamin A';
-    protected static ?string $pluralModelLabel = 'Data Vitamin A';
+    protected static ?string $pluralModelLabel = 'Vitamin A';
     protected static ?string $navigationGroup  = 'Transaksi';
     protected static ?int    $navigationSort   = 3;
 

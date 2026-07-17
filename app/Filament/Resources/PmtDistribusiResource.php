@@ -18,7 +18,7 @@ class PmtDistribusiResource extends Resource
     protected static ?string $model            = PmtDistribusi::class;
     protected static ?string $navigationLabel  = 'PMT Distribusi';
     protected static ?string $modelLabel       = 'Data PMT Distribusi';
-    protected static ?string $pluralModelLabel = 'Data PMT Distribusi';
+    protected static ?string $pluralModelLabel = 'PMT Distribusi';
     protected static ?string $navigationGroup  = 'Transaksi';
     protected static ?int    $navigationSort   = 5;
 
@@ -135,6 +135,17 @@ class PmtDistribusiResource extends Resource
                         'App\Models\Lansia' => 'danger',
                         default             => 'gray',
                     }),
+                Tables\Columns\TextColumn::make('penerima_id')
+                    ->label('Nama Penerima')
+                    ->getStateUsing(function ($record) {
+                        return match($record->penerima_type) {
+                            'App\Models\Anak'   => \App\Models\Anak::find($record->penerima_id)?->nama ?? '-',
+                            'App\Models\Ibu'    => \App\Models\Ibu::find($record->penerima_id)?->nama ?? '-',
+                            'App\Models\Lansia' => \App\Models\Lansia::find($record->penerima_id)?->nama ?? '-',
+                            default             => '-',
+                        };
+                    })
+                    ->searchable(false),
                 Tables\Columns\TextColumn::make('tgl_distribusi')
                     ->label('Tgl Distribusi')
                     ->date('d/m/Y'),

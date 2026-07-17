@@ -36,12 +36,12 @@ class Laporan extends Page implements HasForms
     public bool    $showPreview  = false;
 
     public array $tabs = [
-        'timbang'      => 'Timbang Balita',
-        'status_gizi'  => 'Status Gizi',
-        'imunisasi'    => 'Imunisasi',
-        'vitamin_a'    => 'Vitamin A',
-        'pmt'          => 'PMT Distribusi',
-        'lansia'       => 'Pemeriksaan Lansia',
+        'timbang'       => 'Timbang Balita',
+        'imunisasi'     => 'Imunisasi',
+        'vitamin_a'     => 'Vitamin A',
+        'pmt'           => 'PMT Distribusi',
+        'lansia'        => 'Pemeriksaan Lansia',
+        'rekapitulasi'  => 'Rekapitulasi Desa',
     ];
 
     public function mount(): void
@@ -103,7 +103,7 @@ class Laporan extends Page implements HasForms
     public function getData(): array
     {
         $data = match($this->activeTab) {
-            'timbang', 'status_gizi' => TimbangBalita::with(['anak', 'posyandu', 'hasilGizi'])
+            'timbang'=> TimbangBalita::with(['anak', 'posyandu', 'hasilGizi'])
                 ->when($this->posyandu_id, fn($q) => $q->where('posyandu_id', $this->posyandu_id))
                 ->when($this->bulan, fn($q) => $q->whereMonth('tgl_periksa', $this->bulan))
                 ->when($this->tahun, fn($q) => $q->whereYear('tgl_periksa', $this->tahun))
@@ -134,6 +134,19 @@ class Laporan extends Page implements HasForms
                 ->when($this->tahun, fn($q) => $q->whereYear('tgl_periksa', $this->tahun))
                 ->get(),
 
+            'rekapitulasi' => Posyandu::withCount(['anak', 'lansia'])
+                ->withCount([
+                    'anak as total_timbang' => fn($q) => $q->whereHas('timbang'),
+                    'anak as total_stunting' => fn($q) => $q->whereHas('timbang.hasilGizi', fn($q) =>
+                        $q->whereIn('status_tbU', ['Pendek', 'Sangat Pendek'])
+                    ),
+                    'anak as total_gizi_kurang' => fn($q) => $q->whereHas('timbang.hasilGizi', fn($q) =>
+                        $q->whereIn('status_bbU', ['Gizi Kurang', 'Gizi Buruk'])
+                    ),
+                ])
+                ->when($this->posyandu_id, fn($q) => $q->where('id', $this->posyandu_id))
+                ->get(),
+
             default => collect(),
         };
 
@@ -155,13 +168,32 @@ class Laporan extends Page implements HasForms
 
     public function exportPdf()
     {
-        $data = $this->getData();
-        $pdf  = Pdf::loadView('laporan.pdf', [
-            'data'  => $data['data'],
-            'jenis' => $this->activeTab,
-            'bulan' => $this->bulan,
-            'tahun' => $this->tahun,
-        ])->setPaper('a4', 'landscape');
+        $data     = $this->getData();
+        $posyandu = $this->posyandu_id
+            ? \App\Models\Posyandu::find($this->posyandu_id)
+            : null;
+
+        $kader = $posyandu
+            ? \App\Models\User::where('posyandu_id', $posyandu->id)
+                ->where('role', 'kader')
+                ->first()
+            : null;
+
+        // Ambil kecamatan dari data pertama jika semua posyandu
+        $kecamatan = $posyandu?->kecamatan
+            ?? $data['data']->first()?->posyandu?->kecamatan
+            ?? \App\Models\Posyandu::first()?->kecamatan
+            ?? 'Semua Posyandu';
+
+        $pdf = Pdf::loadView('laporan.pdf', [
+            'data'       => $data['data'],
+            'jenis'      => $this->activeTab,
+            'bulan'      => $this->bulan,
+            'tahun'      => $this->tahun,
+            'posyandu'   => $posyandu,
+            'kader'      => $kader,
+            'kecamatan'  => $kecamatan,
+        ])->setPaper('a4', 'portrait');
 
         return response()->streamDownload(
             fn () => print($pdf->output()),

@@ -17,7 +17,7 @@ class ImunisasiResource extends Resource
     protected static ?string $model            = Imunisasi::class;
     protected static ?string $navigationLabel  = 'Imunisasi';
     protected static ?string $modelLabel       = 'Data Imunisasi';
-    protected static ?string $pluralModelLabel = 'Data Imunisasi';
+    protected static ?string $pluralModelLabel = 'Imunisasi';
     protected static ?string $navigationGroup  = 'Transaksi';
     protected static ?int    $navigationSort   = 2;
 

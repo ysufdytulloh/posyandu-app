@@ -17,8 +17,8 @@ class JenisPmtResource extends Resource
 {
     protected static ?string $navigationGroup = 'Pengaturan';
     protected static ?string $navigationLabel = 'Jenis PMT';
-    protected static ?string $modelLabel = 'Jenis PMT';
-    protected static ?string $pluralModelLabel = 'Data Jenis PMT';
+    protected static ?string $modelLabel = 'Data Jenis PMT';
+    protected static ?string $pluralModelLabel = 'Jenis PMT';
     protected static ?int $navigationSort = 2;
     public static function form(Form $form): Form
 {

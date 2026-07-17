@@ -72,6 +72,15 @@ class PosyanduResource extends Resource
                 Tables\Columns\TextColumn::make('nama')
                     ->label('Nama Posyandu')
                     ->searchable(),
+                Tables\Columns\TextColumn::make('kader')
+                    ->label('Kader')
+                    ->getStateUsing(fn ($record) =>
+                        \App\Models\User::where('posyandu_id', $record->id)
+                            ->where('role', 'kader')
+                            ->pluck('name')
+                            ->join(', ')
+                    )
+                    ->placeholder('-'),
                 Tables\Columns\TextColumn::make('kelurahan')
                     ->label('Kelurahan')
                     ->searchable(),
