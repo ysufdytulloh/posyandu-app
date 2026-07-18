@@ -30,4 +30,5 @@ class Ibu extends Model
     {
         return $this->hasOne(Kehamilan::class)->where('status', 'aktif');
     }
+
 }

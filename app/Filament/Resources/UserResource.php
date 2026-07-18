@@ -91,6 +91,9 @@ class UserResource extends Resource
         return $table
             ->recordUrl(null)
             ->columns([
+                Tables\Columns\TextColumn::make('no')
+                    ->label('No')
+                    ->rowIndex(),
                 Tables\Columns\TextColumn::make('name')
                     ->label('Nama')
                     ->searchable(),
@@ -156,7 +159,8 @@ class UserResource extends Resource
                     ->icon(null)
                     ->hidden(fn ($record) => $record->role === 'admin_desa'),
             ])
-            ->bulkActions([]);
+            ->bulkActions([])
+            ->paginated(false);
     }
 
     public static function getPages(): array

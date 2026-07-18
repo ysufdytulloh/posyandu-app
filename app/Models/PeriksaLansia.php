@@ -13,11 +13,11 @@ class PeriksaLansia extends Model
     protected $table = 'periksa_lansia';
 
     protected $fillable = [
-        'lansia_id', 'posyandu_id', 'kader_id', 'tgl_periksa',
-        'berat_kg', 'tinggi_cm', 'imt',
+        'posyandu_id', 'lansia_id', 'kader_id', 'tgl_periksa',
+        'berat_kg', 'tinggi_cm', 'imt', 'lingkar_perut',
         'tensi_sistol', 'tensi_diastol',
         'gula_darah', 'kolesterol', 'asam_urat',
-        'lingkar_perut', 'keluhan',
+        'spo2', 'nadi', 'obat_rutin', 'keluhan',
     ];
 
     protected $casts = [

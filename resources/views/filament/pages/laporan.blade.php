@@ -8,6 +8,9 @@ $tabConfig = [
     'pmt'          => ['label' => 'PMT Distribusi',         'icon' => 'heroicon-o-gift',              'color' => 'orange'],
     'lansia'       => ['label' => 'Pemeriksaan Lansia',     'icon' => 'heroicon-o-user-circle',       'color' => 'red'],
     'rekapitulasi' => ['label' => 'Rekapitulasi Desa',      'icon' => 'heroicon-o-building-office-2', 'color' => 'teal'],
+    'kehamilan' => ['label' => 'Kehamilan', 'icon' => 'heroicon-o-heart', 'color' => 'pink'],
+    'sdidtk'      => ['label' => 'SDIDTK',       'icon' => 'heroicon-o-clipboard-document-check', 'color' => 'violet'],
+    'obat_cacing' => ['label' => 'Obat Cacing',   'icon' => 'heroicon-o-beaker',                  'color' => 'lime'],
 ];
 $colorMap = [
     'blue'   => ['bg' => 'bg-blue-50',   'text' => 'text-blue-600',   'active_bg' => 'bg-blue-600',   'border' => 'border-blue-200'],
@@ -17,13 +20,16 @@ $colorMap = [
     'orange' => ['bg' => 'bg-orange-50', 'text' => 'text-orange-600', 'active_bg' => 'bg-orange-600', 'border' => 'border-orange-200'],
     'red'    => ['bg' => 'bg-red-50',    'text' => 'text-red-600',    'active_bg' => 'bg-red-600',    'border' => 'border-red-200'],
     'teal'   => ['bg' => 'bg-teal-50',   'text' => 'text-teal-600',   'active_bg' => 'bg-teal-600',   'border' => 'border-teal-200'],
+    'pink' => ['bg' => 'bg-pink-50', 'text' => 'text-pink-600', 'active_bg' => 'bg-pink-600', 'border' => 'border-pink-200'],
+    'violet' => ['bg' => 'bg-violet-50', 'text' => 'text-violet-600', 'active_bg' => 'bg-violet-600', 'border' => 'border-violet-200'],
+    'lime'   => ['bg' => 'bg-lime-50',   'text' => 'text-lime-600',   'active_bg' => 'bg-lime-600',   'border' => 'border-lime-200'],
 ];
 $active      = $tabConfig[$this->activeTab];
 $activeColor = $colorMap[$active['color']];
 @endphp
 
 {{-- ── TABS ── --}}
-<div class="grid grid-cols-3 md:grid-cols-6 gap-3">
+<div class="grid grid-cols-3 md:grid-cols-9 gap-3">
     @foreach($tabConfig as $key => $tab)
     @php $isActive = $this->activeTab === $key; $c = $colorMap[$tab['color']]; @endphp
     <button
@@ -139,6 +145,22 @@ $activeColor = $colorMap[$active['color']];
                         @foreach(['No','Nama Posyandu','Total Balita','Total Lansia','Sudah Timbang','Stunting','Gizi Kurang'] as $h)
                             <th class="text-left py-3 px-5 text-xs font-semibold text-gray-400 uppercase tracking-wider whitespace-nowrap">{{ $h }}</th>
                         @endforeach
+                    @elseif($this->activeTab === 'kehamilan')
+                        @foreach(['No','Posyandu','Nama Ibu','HPHT','HPL','Usia Kehamilan','Status'] as $h)
+                            <th class="text-left py-3 px-5 text-xs font-semibold text-gray-400 uppercase tracking-wider whitespace-nowrap">{{ $h }}</th>
+                        @endforeach
+                    @elseif($this->activeTab === 'sdidtk')
+                        @foreach(['No','Posyandu','Nama Anak','Tgl Periksa','Usia','MK','MH','BB','SK','Hasil'] as $h)
+                            <th class="text-left py-3 px-5 text-xs font-semibold text-gray-400 uppercase tracking-wider whitespace-nowrap">{{ $h }}</th>
+                        @endforeach
+                    @elseif($this->activeTab === 'obat_cacing')
+                        @foreach(['No','Posyandu','Nama Anak','Tgl Pemberian','Dosis','Kader'] as $h)
+                            <th class="text-left py-3 px-5 text-xs font-semibold text-gray-400 uppercase tracking-wider whitespace-nowrap">{{ $h }}</th>
+                        @endforeach
+                    @elseif($this->activeTab === 'kehamilan')
+                        @foreach(['No','Posyandu','Nama Ibu','HPHT','HPL','Status'] as $h)
+                            <th class="text-left py-3 px-5 text-xs font-semibold text-gray-400 uppercase tracking-wider whitespace-nowrap">{{ $h }}</th>
+                        @endforeach
                     @endif
                 </tr>
             </thead>
@@ -236,12 +258,125 @@ $activeColor = $colorMap[$active['color']];
                                 {{ $row->total_gizi_kurang }}
                             </span>
                         </td>
+                    @elseif($this->activeTab === 'kehamilan')
+                        <td class="py-3.5 px-5 text-gray-300 text-xs">{{ $i+1 }}</td>
+                        <td class="py-3.5 px-5 text-gray-500 text-xs">{{ $row->ibu?->posyandu?->nama ?? '-' }}</td>
+                        <td class="py-3.5 px-5 font-semibold text-gray-700">{{ $row->ibu?->nama ?? '-' }}</td>
+                        <td class="py-3.5 px-5 text-gray-500 text-xs whitespace-nowrap">{{ \Carbon\Carbon::parse($row->hpht)->format('d/m/Y') }}</td>
+                        <td class="py-3.5 px-5 text-gray-500 text-xs whitespace-nowrap">{{ $row->tgl_perkiraan_lahir ? \Carbon\Carbon::parse($row->tgl_perkiraan_lahir)->format('d/m/Y') : '-' }}</td>
+                        <td class="py-3.5 px-5 text-gray-600 text-xs">{{ $row->usia_kehamilan ? $row->usia_kehamilan . ' minggu' : '-' }}</td>
+                        <td class="py-3.5 px-5">
+                            @php $status = $row->status ?? '-'; @endphp
+                            <span class="px-2.5 py-1 rounded-lg text-xs font-semibold
+                                {{ $status === 'aktif' ? 'bg-green-50 text-green-600' :
+                                ($status === 'melahirkan' ? 'bg-blue-50 text-blue-600' :
+                                ($status === 'keguguran' ? 'bg-red-50 text-red-600' : 'bg-gray-50 text-gray-400')) }}">
+                                {{ ucfirst($status) }}
+                            </span>
+                        </td>
+                    @elseif($this->activeTab === 'sdidtk')
+                        <td class="py-3.5 px-5 text-gray-300 text-xs">{{ $i+1 }}</td>
+                        <td class="py-3.5 px-5 text-gray-500 text-xs">{{ $row->anak?->posyandu?->nama ?? '-' }}</td>
+                        <td class="py-3.5 px-5 font-semibold text-gray-700">{{ $row->anak?->nama ?? '-' }}</td>
+                        <td class="py-3.5 px-5 text-gray-500 text-xs whitespace-nowrap">{{ \Carbon\Carbon::parse($row->tgl_periksa)->format('d/m/Y') }}</td>
+                        <td class="py-3.5 px-5 text-gray-600 text-xs">{{ $row->usia_bulan }} bln</td>
+                        @foreach(['motorik_kasar','motorik_halus','bicara_bahasa','sosial_kemandirian'] as $aspek)
+                        <td class="py-3.5 px-5">
+                            <span class="px-2 py-0.5 rounded-lg text-xs font-semibold
+                                {{ $row->$aspek === 'S' ? 'bg-green-50 text-green-600' :
+                                ($row->$aspek === 'M' ? 'bg-amber-50 text-amber-600' : 'bg-red-50 text-red-600') }}">
+                                {{ $row->$aspek }}
+                            </span>
+                        </td>
+                        @endforeach
+                        <td class="py-3.5 px-5">
+                            <span class="px-2 py-0.5 rounded-lg text-xs font-semibold
+                                {{ $row->hasil === 'Normal' ? 'bg-green-50 text-green-600' :
+                                ($row->hasil === 'Suspek' ? 'bg-amber-50 text-amber-600' : 'bg-red-50 text-red-600') }}">
+                                {{ $row->hasil }}
+                            </span>
+                        </td>
+                    @elseif($this->activeTab === 'obat_cacing')
+                        <td class="py-3.5 px-5 text-gray-300 text-xs">{{ $i+1 }}</td>
+                        <td class="py-3.5 px-5 text-gray-500 text-xs">{{ $row->anak?->posyandu?->nama ?? '-' }}</td>
+                        <td class="py-3.5 px-5 font-semibold text-gray-700">{{ $row->anak?->nama ?? '-' }}</td>
+                        <td class="py-3.5 px-5 text-gray-500 text-xs whitespace-nowrap">{{ \Carbon\Carbon::parse($row->tgl_pemberian)->format('d/m/Y') }}</td>
+                        <td class="py-3.5 px-5"><span class="px-2 py-0.5 bg-lime-50 text-lime-600 rounded-lg text-xs font-semibold">{{ $row->dosis }}</span></td>
+                        <td class="py-3.5 px-5 text-gray-600 text-xs">{{ $row->kader?->name ?? '-' }}</td>
+                    @elseif($this->activeTab === 'kehamilan')
+                        <td class="py-3.5 px-5 text-gray-300 text-xs">{{ $i+1 }}</td>
+                        <td class="py-3.5 px-5 text-gray-500 text-xs">{{ $row->ibu?->posyandu?->nama ?? '-' }}</td>
+                        <td class="py-3.5 px-5 font-semibold text-gray-700">{{ $row->ibu?->nama ?? '-' }}</td>
+                        <td class="py-3.5 px-5 text-gray-500 text-xs whitespace-nowrap">{{ \Carbon\Carbon::parse($row->hpht)->format('d/m/Y') }}</td>
+                        <td class="py-3.5 px-5 text-gray-500 text-xs whitespace-nowrap">{{ $row->tgl_perkiraan_lahir ? \Carbon\Carbon::parse($row->tgl_perkiraan_lahir)->format('d/m/Y') : '-' }}</td>
+                        <td class="py-3.5 px-5">
+                            <span class="px-2 py-0.5 rounded-lg text-xs font-semibold
+                                {{ $row->status === 'aktif' ? 'bg-green-50 text-green-600' :
+                                ($row->status === 'melahirkan' ? 'bg-blue-50 text-blue-600' : 'bg-red-50 text-red-600') }}">
+                                {{ ucfirst($row->status) }}
+                            </span>
+                        </td>
                     @endif
                 </tr>
                 @endforeach
             </tbody>
         </table>
     </div>
+
+    {{-- Tabel 2: Detail Pemeriksaan Kehamilan --}}
+        @if($this->activeTab === 'kehamilan' && isset($result['periksa']) && $result['periksa']->isNotEmpty())
+        <div class="mt-6">
+            <div class="px-5 py-3 border-b border-gray-50">
+                <p class="text-sm font-semibold text-gray-700">Detail Pemeriksaan (K1-K4)</p>
+                <p class="text-xs text-gray-400">{{ $result['periksa']->count() }} data pemeriksaan</p>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr class="bg-gray-50">
+                            @foreach(['No','Nama Ibu','Kunjungan','Tgl Periksa','BB (kg)','LILA','TFU','DJJ','HB','Tensi','Status Gizi'] as $h)
+                                <th class="text-left py-3 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider whitespace-nowrap">{{ $h }}</th>
+                            @endforeach
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-50">
+                        @foreach($result['periksa'] as $i => $p)
+                        <tr class="hover:bg-gray-50/60 transition-colors">
+                            <td class="py-3 px-4 text-gray-300 text-xs">{{ $i+1 }}</td>
+                            <td class="py-3 px-4 font-semibold text-gray-700">{{ $p->kehamilan?->ibu?->nama ?? '-' }}</td>
+                            <td class="py-3 px-4">
+                                <span class="px-2 py-0.5 rounded-lg text-xs font-semibold
+                                    {{ $p->kunjungan_ke === 'K1' ? 'bg-blue-50 text-blue-600' :
+                                    ($p->kunjungan_ke === 'K2' ? 'bg-green-50 text-green-600' :
+                                    ($p->kunjungan_ke === 'K3' ? 'bg-amber-50 text-amber-600' : 'bg-red-50 text-red-600')) }}">
+                                    {{ $p->kunjungan_ke }}
+                                </span>
+                            </td>
+                            <td class="py-3 px-4 text-gray-500 text-xs whitespace-nowrap">{{ $p->tgl_periksa->format('d/m/Y') }}</td>
+                            <td class="py-3 px-4 font-semibold text-gray-700">{{ $p->berat_badan ? $p->berat_badan.' kg' : '-' }}</td>
+                            <td class="py-3 px-4 text-gray-600 text-xs {{ $p->lila_cm && $p->lila_cm < 23.5 ? 'text-red-600 font-bold' : '' }}">{{ $p->lila_cm ? $p->lila_cm.' cm' : '-' }}</td>
+                            <td class="py-3 px-4 text-gray-600 text-xs">{{ $p->tfu_cm ? $p->tfu_cm.' cm' : '-' }}</td>
+                            <td class="py-3 px-4 text-gray-600 text-xs {{ $p->djj && ($p->djj < 120 || $p->djj > 160) ? 'text-red-600 font-bold' : '' }}">{{ $p->djj ? $p->djj.' bpm' : '-' }}</td>
+                            <td class="py-3 px-4 text-gray-600 text-xs {{ $p->hb && $p->hb < 11 ? 'text-red-600 font-bold' : '' }}">{{ $p->hb ? $p->hb.' g/dL' : '-' }}</td>
+                            <td class="py-3 px-4 text-gray-600 text-xs {{ $p->tensi_sistol && $p->tensi_sistol > 140 ? 'text-red-600 font-bold' : '' }}">
+                                {{ $p->tensi_sistol && $p->tensi_diastol ? $p->tensi_sistol.'/'.$p->tensi_diastol : '-' }}
+                            </td>
+                            <td class="py-3 px-4">
+                                @if($p->status_gizi)
+                                <span class="px-2 py-0.5 rounded-lg text-xs font-semibold {{ $p->status_gizi === 'Normal' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600' }}">
+                                    {{ $p->status_gizi }}
+                                </span>
+                                @else -
+                                @endif
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        @endif
+
     @endif
 </div>
 @endif

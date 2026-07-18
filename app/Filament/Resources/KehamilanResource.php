@@ -14,11 +14,11 @@ use Filament\Tables\Table;
 class KehamilanResource extends Resource
 {
     protected static ?string $model            = Kehamilan::class;
-    protected static ?string $navigationLabel  = 'Data Kehamilan';
-    protected static ?string $modelLabel       = 'Data Kehamilan';
-    protected static ?string $pluralModelLabel = 'Data Riwayat Kehamilan';
-    protected static ?string $navigationGroup  = 'Master Data';
-    protected static ?int    $navigationSort   = 5;
+    protected static ?string $navigationLabel  = 'Data Ibu Hamil';
+    protected static ?string $modelLabel       = 'Data Ibu Hamil';
+    protected static ?string $pluralModelLabel = 'Data Ibu Hamil';
+    protected static ?string $navigationGroup  = 'Kesehatan Ibu & Anak';
+    protected static ?int    $navigationSort   = 2;
 
     public static function form(Form $form): Form
     {
@@ -78,6 +78,9 @@ class KehamilanResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('no')
+                    ->label('No')
+                    ->rowIndex(),
                 Tables\Columns\TextColumn::make('ibu.nama')
                     ->label('Nama Ibu')
                     ->searchable()
@@ -146,7 +149,8 @@ class KehamilanResource extends Resource
                     ->color('danger')
                     ->icon(null),
             ])
-            ->bulkActions([]);
+            ->bulkActions([])
+            ->paginated(false);
     }
 
     public static function getPages(): array

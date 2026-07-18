@@ -53,6 +53,9 @@ class JenisImunisasiResource extends Resource
 {
     return $table
         ->columns([
+                Tables\Columns\TextColumn::make('no')
+                    ->label('No')
+                    ->rowIndex(),
             Tables\Columns\TextColumn::make('kode')
                 ->label('Kode')
                 ->badge()
@@ -78,7 +81,8 @@ class JenisImunisasiResource extends Resource
                 ->button()
                 ->color('warning'),
         ])
-        ->bulkActions([]);
+        ->bulkActions([])
+            ->paginated(false);
 }
 
     public static function getRelations(): array

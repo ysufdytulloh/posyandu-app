@@ -21,9 +21,9 @@ class GrafikKMS extends Page implements HasForms
 
     protected static ?string $navigationLabel = 'Grafik KMS';
     protected static ?string $navigationIcon  = 'heroicon-o-chart-bar';
-    protected static ?string $navigationGroup = 'Transaksi';
+    protected static ?string $navigationGroup = 'Kesehatan Ibu & Anak';
     protected static ?string $title           = 'Grafik KMS';
-    protected static ?int    $navigationSort  = 6;
+    protected static ?int    $navigationSort  = 11;
     protected static string  $view            = 'filament.pages.grafik-k-m-s';
 
     public ?string $posyandu_id = null;
@@ -178,7 +178,7 @@ class GrafikKMS extends Page implements HasForms
     {
         return [
             Action::make('exportPdf')
-                ->label('Print KMS')
+                ->label('Cetak KMS')
                 ->icon('heroicon-o-printer')
                 ->color('primary')
                 ->visible(fn () => $this->anak_id !== null)

@@ -18,8 +18,8 @@ class TimbangBalitaResource extends Resource
     protected static ?string $navigationLabel  = 'Timbang Balita';
     protected static ?string $modelLabel       = 'Data Timbang Balita';
     protected static ?string $pluralModelLabel = 'Timbang Balita';
-    protected static ?string $navigationGroup  = 'Transaksi';
-    protected static ?int    $navigationSort   = 1;
+    protected static ?string $navigationGroup  = 'Kesehatan Ibu & Anak';
+    protected static ?int    $navigationSort   = 6;
 
     public static function form(Form $form): Form
     {
@@ -77,6 +77,19 @@ class TimbangBalitaResource extends Resource
                             ->step(0.1)
                             ->suffix('cm')
                             ->required(),
+                        Forms\Components\TextInput::make('lingkar_kepala_cm')
+                            ->label('Lingkar Kepala (cm)')
+                            ->numeric()
+                            ->step(0.1)
+                            ->suffix('cm')
+                            ->helperText('Normal: 33-37 cm (newborn) | < 2 th: +1 cm/bulan'),
+
+                        Forms\Components\TextInput::make('lila_cm')
+                            ->label('LILA (cm)')
+                            ->numeric()
+                            ->step(0.1)
+                            ->suffix('cm')
+                            ->helperText('Normal ≥ 12.5 cm | < 12.5 cm = gizi buruk'),
                         Forms\Components\Textarea::make('catatan')
                             ->label('Catatan')
                             ->rows(3)
@@ -89,6 +102,9 @@ class TimbangBalitaResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('no')
+                    ->label('No')
+                    ->rowIndex(),
                 Tables\Columns\TextColumn::make('posyandu.nama')
                     ->label('Posyandu')
                     ->searchable(),
@@ -110,22 +126,13 @@ class TimbangBalitaResource extends Resource
                     ->label('Status BB/U')
                     ->badge()
                     ->color(fn (?string $state): string => match($state) {
-                        'Normal'       => 'success',
-                        'Gizi Kurang'  => 'warning',
-                        'Gizi Buruk'   => 'danger',
-                        'Gizi Lebih'   => 'info',
-                        'Tidak Diketahui' => 'danger',
-                        default        => 'gray',
+                        'Normal'      => 'success',
+                        'Gizi Kurang' => 'warning',
+                        'Gizi Buruk'  => 'danger',
+                        'Gizi Lebih'  => 'info',
+                        default       => 'gray',
                     })
                     ->placeholder('-'),
-                Tables\Columns\TextColumn::make('hasilGizi.bbU_zscore')
-                    ->label('Z-Score BB/U')
-                    ->formatStateUsing(fn (?string $state): string =>
-                        $state !== null ? number_format((float)$state, 2) : '-'
-                    )
-                    ->color(fn (?string $state): string =>
-                        $state !== null && (float)$state < -2 ? 'danger' : 'gray'
-                    ),
                 Tables\Columns\TextColumn::make('hasilGizi.status_tbU')
                     ->label('Status TB/U')
                     ->badge()
@@ -134,18 +141,44 @@ class TimbangBalitaResource extends Resource
                         'Pendek'        => 'warning',
                         'Sangat Pendek' => 'danger',
                         'Tinggi'        => 'info',
-                        'Tidak Diketahui' => 'danger',
                         default         => 'gray',
                     })
                     ->placeholder('-'),
+                Tables\Columns\TextColumn::make('hasilGizi.status_bbTb')
+                    ->label('Status BB/TB')
+                    ->badge()
+                    ->color(fn (?string $state): string => match($state) {
+                        'Normal'       => 'success',
+                        'Kurus'        => 'warning',
+                        'Sangat Kurus' => 'danger',
+                        'Gemuk'        => 'info',
+                        'Obesitas'     => 'danger',
+                        default        => 'gray',
+                    })
+                    ->placeholder('-')
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('hasilGizi.bbU_zscore')
+                    ->label('Z-Score BB/U')
+                    ->formatStateUsing(fn (?string $state): string =>
+                        $state !== null ? number_format((float)$state, 2) : '-'
+                    )
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('hasilGizi.tbU_zscore')
                     ->label('Z-Score TB/U')
                     ->formatStateUsing(fn (?string $state): string =>
                         $state !== null ? number_format((float)$state, 2) : '-'
                     )
-                    ->color(fn (?string $state): string =>
-                        $state !== null && (float)$state < -2 ? 'danger' : 'gray'
-                    ),
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('lingkar_kepala_cm')
+                    ->label('LK (cm)')
+                    ->numeric(decimalPlaces: 1)
+                    ->placeholder('-')
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('lila_cm')
+                    ->label('LILA (cm)')
+                    ->numeric(decimalPlaces: 1)
+                    ->placeholder('-')
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->defaultSort('tgl_periksa', 'desc')
             ->searchPlaceholder('Cari nama anak...')
@@ -164,13 +197,12 @@ class TimbangBalitaResource extends Resource
             ->actions([
                 Tables\Actions\DeleteAction::make()
                     ->label('Hapus')
-                    ->button()          // Membentuk kotak tombol
-                    ->outlined()        // <-- Menambahkan BORDER (garis tepi) merah
-                    ->hiddenLabel()     // Sembunyikan teks "Hapus", sisakan icon saja
+                    ->button()
                     ->color('danger')
-                    ->icon('heroicon-o-trash'),
+                    ->icon(null),
             ])
-            ->bulkActions([]);
+            ->bulkActions([])
+            ->paginated(false);
     }
 
     public static function getPages(): array

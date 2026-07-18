@@ -13,11 +13,11 @@ use Filament\Tables\Table;
 class IbuResource extends Resource
 {
     protected static ?string $model            = Ibu::class;
-    protected static ?string $navigationGroup  = 'Master Data';
+    protected static ?string $navigationGroup  = 'Kesehatan Ibu & Anak';
     protected static ?string $navigationLabel  = 'Data Ibu';
     protected static ?string $modelLabel       = 'Data Ibu';
     protected static ?string $pluralModelLabel = 'Data Ibu';
-    protected static ?int    $navigationSort   = 2;
+    protected static ?int    $navigationSort   = 1;
 
     public static function form(Form $form): Form
     {
@@ -92,6 +92,9 @@ class IbuResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('no')
+                    ->label('No')
+                    ->rowIndex(),
                 Tables\Columns\TextColumn::make('posyandu.nama')
                     ->label('Posyandu')
                     ->searchable(),
@@ -145,7 +148,26 @@ class IbuResource extends Resource
                     ->color('danger')
                     ->icon(null),
             ])
-            ->bulkActions([]);
+            ->bulkActions([])
+            ->paginated(false);
+    }
+
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['nama', 'nik'];
+    }
+
+    public static function getGlobalSearchResultTitle(\Illuminate\Database\Eloquent\Model $record): string
+    {
+        return $record->nama;
+    }
+
+    public static function getGlobalSearchResultDetails(\Illuminate\Database\Eloquent\Model $record): array
+    {
+        return [
+            'Posyandu' => $record->posyandu?->nama ?? '-',
+            'NIK'      => $record->nik ?? '-',
+        ];
     }
 
     public static function getPages(): array

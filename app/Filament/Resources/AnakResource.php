@@ -10,15 +10,16 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Support\Colors\Color;
+use Illuminate\Database\Eloquent\Model;
 
 class AnakResource extends Resource
 {
     protected static ?string $model            = Anak::class;
-    protected static ?string $navigationGroup  = 'Master Data';
+    protected static ?string $navigationGroup  = 'Kesehatan Ibu & Anak';
     protected static ?string $navigationLabel  = 'Data Anak';
     protected static ?string $modelLabel       = 'Data Anak';
     protected static ?string $pluralModelLabel = 'Data Anak';
-    protected static ?int    $navigationSort   = 3;
+    protected static ?int    $navigationSort   = 5;
 
     public static function form(Form $form): Form
     {
@@ -77,6 +78,9 @@ class AnakResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('no')
+                    ->label('No')
+                    ->rowIndex(),
                 Tables\Columns\TextColumn::make('posyandu.nama')
                     ->label('Posyandu')
                     ->searchable(),
@@ -129,8 +133,13 @@ class AnakResource extends Resource
                     ->color('danger')
                     ->icon(null),
             ])
-            ->bulkActions([]);
+            ->bulkActions([])
+            ->paginated(false);
     }
+
+    public static function getGloballySearchableAttributes(): array { return ["nama", "nik"]; }
+
+    public static function getGlobalSearchResultTitle(Model $record): string { return $record->nama; }
 
     public static function getPages(): array
     {

@@ -205,7 +205,7 @@ kms-pdf.blade.php
     @endif
 
     <!-- LEGEND GRAFIK -->
-    <table class="legend-table">
+    <table>
         <tr>
             <td>
                 <span class="legend-line" style="background-color: #dc2626;"></span>

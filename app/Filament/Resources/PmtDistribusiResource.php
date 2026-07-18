@@ -19,8 +19,8 @@ class PmtDistribusiResource extends Resource
     protected static ?string $navigationLabel  = 'PMT Distribusi';
     protected static ?string $modelLabel       = 'Data PMT Distribusi';
     protected static ?string $pluralModelLabel = 'PMT Distribusi';
-    protected static ?string $navigationGroup  = 'Transaksi';
-    protected static ?int    $navigationSort   = 5;
+    protected static ?string $navigationGroup  = 'PMT';
+    protected static ?int    $navigationSort   = 1;
 
     public static function form(Form $form): Form
     {
@@ -83,7 +83,9 @@ class PmtDistribusiResource extends Resource
 
                                 return match($type) {
                                     'App\Models\Anak'   => Anak::where('posyandu_id', $posyandId)->pluck('nama', 'id'),
-                                    'App\Models\Ibu'    => Ibu::where('posyandu_id', $posyandId)->pluck('nama', 'id'),
+                                    'App\Models\Ibu' => Ibu::where('posyandu_id', $posyandId)
+                                        ->whereHas('kehamilanAktif')
+                                        ->pluck('nama', 'id'),
                                     'App\Models\Lansia' => Lansia::where('posyandu_id', $posyandId)->pluck('nama', 'id'),
                                     default             => [],
                                 };
@@ -112,6 +114,9 @@ class PmtDistribusiResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('no')
+                    ->label('No')
+                    ->rowIndex(),
                 Tables\Columns\TextColumn::make('posyandu.nama')
                     ->label('Posyandu')
                     ->searchable(),
@@ -184,7 +189,8 @@ class PmtDistribusiResource extends Resource
                     ->color('danger')
                     ->icon(null),
             ])
-            ->bulkActions([]);
+            ->bulkActions([])
+            ->paginated(false);
     }
 
     public static function getPages(): array

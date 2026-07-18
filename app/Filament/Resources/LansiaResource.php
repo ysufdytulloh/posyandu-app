@@ -14,11 +14,11 @@ use Filament\Support\Colors\Color;
 class LansiaResource extends Resource
 {
     protected static ?string $model            = Lansia::class;
-    protected static ?string $navigationGroup  = 'Master Data';
+    protected static ?string $navigationGroup  = 'Kesehatan Lansia';
     protected static ?string $navigationLabel  = 'Data Lansia';
     protected static ?string $modelLabel       = 'Data Lansia';
     protected static ?string $pluralModelLabel = 'Data Lansia';
-    protected static ?int    $navigationSort   = 4;
+    protected static ?int    $navigationSort   = 1;
 
     public static function form(Form $form): Form
     {
@@ -89,6 +89,9 @@ class LansiaResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('no')
+                    ->label('No')
+                    ->rowIndex(),
                 Tables\Columns\TextColumn::make('posyandu.nama')
                     ->label('Posyandu')
                     ->searchable(),
@@ -141,7 +144,25 @@ class LansiaResource extends Resource
                     ->color('danger')
                     ->icon(null),
             ])
-            ->bulkActions([]);
+            ->bulkActions([])
+            ->paginated(false);
+    }
+
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['nama'];
+    }
+
+    public static function getGlobalSearchResultTitle(\Illuminate\Database\Eloquent\Model $record): string
+    {
+        return $record->nama;
+    }
+
+    public static function getGlobalSearchResultDetails(\Illuminate\Database\Eloquent\Model $record): array
+    {
+        return [
+            'Posyandu' => $record->posyandu?->nama ?? '-',
+        ];
     }
 
     public static function getPages(): array

@@ -16,8 +16,8 @@ class PeriksaLansiaResource extends Resource
     protected static ?string $navigationLabel  = 'Pemeriksaan Lansia';
     protected static ?string $modelLabel       = 'Data Pemeriksaan Lansia';
     protected static ?string $pluralModelLabel = 'Pemeriksaan Lansia';
-    protected static ?string $navigationGroup  = 'Transaksi';
-    protected static ?int    $navigationSort   = 4;
+    protected static ?string $navigationGroup  = 'Kesehatan Lansia';
+    protected static ?int    $navigationSort   = 2;
 
     public static function form(Form $form): Form
     {
@@ -118,10 +118,28 @@ class PeriksaLansiaResource extends Resource
                             ->numeric()
                             ->step(0.1)
                             ->suffix('mg/dL'),
+                        Forms\Components\TextInput::make('spo2')
+                            ->label('Saturasi Oksigen (SpO2)')
+                            ->numeric()
+                            ->minValue(0)
+                            ->maxValue(100)
+                            ->suffix('%')
+                            ->helperText('Normal ≥ 95%'),
+
+                        Forms\Components\TextInput::make('nadi')
+                            ->label('Denyut Nadi')
+                            ->numeric()
+                            ->suffix('bpm')
+                            ->helperText('Normal 60-100 bpm'),
                     ])->columns(2),
 
                 Forms\Components\Section::make('Catatan')
                     ->schema([
+                        Forms\Components\Textarea::make('obat_rutin')
+                            ->label('Obat Rutin')
+                            ->rows(2)
+                            ->placeholder('Contoh: Amlodipin 5mg, Metformin 500mg')
+                            ->columnSpanFull(),
                         Forms\Components\Textarea::make('keluhan')
                             ->label('Keluhan')
                             ->rows(3)
@@ -134,6 +152,9 @@ class PeriksaLansiaResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('no')
+                    ->label('No')
+                    ->rowIndex(),
                 Tables\Columns\TextColumn::make('posyandu.nama')
                     ->label('Posyandu')
                     ->searchable(),
@@ -169,6 +190,17 @@ class PeriksaLansiaResource extends Resource
                             ? $record->tensi_sistol . '/' . $record->tensi_diastol
                             : '-'
                     ),
+                Tables\Columns\TextColumn::make('spo2')
+                    ->label('SpO2')
+                    ->formatStateUsing(fn ($state) => $state ? $state . '%' : '-')
+                    ->color(fn ($state) => $state && $state < 95 ? 'danger' : 'gray')
+                    ->toggleable(isToggledHiddenByDefault: true),
+
+                Tables\Columns\TextColumn::make('nadi')
+                    ->label('Nadi')
+                    ->formatStateUsing(fn ($state) => $state ? $state . ' bpm' : '-')
+                    ->color(fn ($state) => $state && ($state < 60 || $state > 100) ? 'danger' : 'gray')
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('kader.name')
                     ->label('Kader'),
             ])
@@ -198,7 +230,8 @@ class PeriksaLansiaResource extends Resource
                     ->color('danger')
                     ->icon(null),
             ])
-            ->bulkActions([]);
+            ->bulkActions([])
+            ->paginated(false);
     }
 
     public static function getPages(): array

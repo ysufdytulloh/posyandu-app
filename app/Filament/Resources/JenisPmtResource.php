@@ -47,6 +47,9 @@ class JenisPmtResource extends Resource
 {
     return $table
         ->columns([
+                Tables\Columns\TextColumn::make('no')
+                    ->label('No')
+                    ->rowIndex(),
             Tables\Columns\TextColumn::make('nama')
                 ->label('Nama PMT')
                 ->searchable(),
@@ -65,7 +68,8 @@ class JenisPmtResource extends Resource
                 ->color('warning')
                 ->icon(null),
         ])
-        ->bulkActions([]);
+        ->bulkActions([])
+            ->paginated(false);
 }
 
     public static function getRelations(): array

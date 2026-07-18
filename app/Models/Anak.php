@@ -29,4 +29,14 @@ class Anak extends Model
     {
         return (int) $this->tgl_lahir->diffInMonths(now());
     }
+
+    public function sdidtk(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Sdidtk::class);
+    }
+
+    public function obatCacing(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(ObatCacing::class);
+    }
 }

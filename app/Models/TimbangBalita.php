@@ -15,7 +15,8 @@ class TimbangBalita extends Model
 
     protected $fillable = [
         'anak_id', 'posyandu_id', 'kader_id',
-        'tgl_periksa', 'berat_kg', 'tinggi_cm', 'catatan',
+        'tgl_periksa', 'berat_kg', 'tinggi_cm',
+        'lingkar_kepala_cm', 'lila_cm', 'catatan',
     ];
 
     protected $casts = [

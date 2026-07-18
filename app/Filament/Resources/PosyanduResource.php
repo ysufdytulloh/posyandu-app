@@ -17,7 +17,7 @@ class PosyanduResource extends Resource
     protected static ?string $navigationLabel   = 'Data Posyandu';
     protected static ?string $modelLabel        = 'Data Posyandu';
     protected static ?string $pluralModelLabel  = 'Data Posyandu';
-    protected static ?string $navigationGroup   = 'Master Data';
+    protected static ?string $navigationGroup   = 'Posyandu';
     protected static ?int    $navigationSort    = 1;
 
     public static function form(Form $form): Form
@@ -69,6 +69,9 @@ class PosyanduResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('no')
+                    ->label('No')
+                    ->rowIndex(),
                 Tables\Columns\TextColumn::make('nama')
                     ->label('Nama Posyandu')
                     ->searchable(),
@@ -131,7 +134,26 @@ class PosyanduResource extends Resource
                     ->color('danger')
                     ->icon(null),
             ])
-            ->bulkActions([]);
+            ->bulkActions([])
+            ->paginated(false);
+    }
+
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['nama', 'kelurahan', 'kecamatan'];
+    }
+
+    public static function getGlobalSearchResultTitle(\Illuminate\Database\Eloquent\Model $record): string
+    {
+        return $record->nama;
+    }
+
+    public static function getGlobalSearchResultDetails(\Illuminate\Database\Eloquent\Model $record): array
+    {
+        return [
+            'Kelurahan' => $record->kelurahan ?? '-',
+            'Kecamatan' => $record->kecamatan ?? '-',
+        ];
     }
 
     public static function getPages(): array

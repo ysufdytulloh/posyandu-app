@@ -74,6 +74,9 @@
                 'pmt'          => 'Laporan Distribusi PMT',
                 'lansia'       => 'Laporan Pemeriksaan Lansia',
                 'rekapitulasi' => 'Rekapitulasi Data Seluruh Posyandu',
+                'kehamilan' => 'Laporan Data Kehamilan',
+                'sdidtk'      => 'Laporan Data SDIDTK',
+                'obat_cacing' => 'Laporan Distribusi Obat Cacing',
                 default        => 'Laporan Data Posyandu',
             };
             $namaBulan = [
@@ -83,7 +86,15 @@
             ];
         @endphp
         <strong>{{ $judulLaporan }}</strong>
-        <p>Periode: {{ $namaBulan[$bulan] ?? $bulan }} {{ $tahun }} &nbsp;&bull;&nbsp; Total Data: {{ count($data) }}</p>
+        <p>
+            Periode:
+            @if($jenis === 'kehamilan')
+                {{ $tahun }}
+            @else
+                {{ $namaBulan[$bulan] ?? $bulan }} {{ $tahun }}
+            @endif
+            &nbsp;&bull;&nbsp; Total: {{ $data->count() }} data
+        </p>
     </div>
 
     <!-- TABEL -->
@@ -113,6 +124,16 @@
                     <th>No</th><th>Nama Posyandu</th><th>Total Balita</th>
                     <th>Total Lansia</th><th>Sudah Timbang</th>
                     <th>Stunting</th><th>Gizi Kurang</th>
+                @elseif($jenis === 'kehamilan')
+                    <th>No</th><th>Posyandu</th><th>Nama Ibu</th>
+                    <th>HPHT</th><th>HPL</th><th>Status</th>
+                @elseif($jenis === 'sdidtk')
+                    <th>No</th><th>Posyandu</th><th>Nama Anak</th>
+                    <th>Tgl Periksa</th><th>Usia</th>
+                    <th>MK</th><th>MH</th><th>BB</th><th>SK</th><th>Hasil</th>
+                @elseif($jenis === 'obat_cacing')
+                    <th>No</th><th>Posyandu</th><th>Nama Anak</th>
+                    <th>Tgl Pemberian</th><th>Dosis</th><th>Kader</th>
                 @endif
             </tr>
         </thead>
@@ -151,7 +172,7 @@
                     <td>{{ $row->posyandu?->nama ?? '-' }}</td>
                     <td>{{ $row->jenisPmt?->nama ?? '-' }}</td>
                     <td>{{ class_basename($row->penerima_type) }}</td>
-                    <td
+                    <td>
                         @php
                             $namaPenerima = match($row->penerima_type) {
                                 'App\Models\Anak'   => \App\Models\Anak::find($row->penerima_id)?->nama ?? '-',
@@ -181,6 +202,31 @@
                     <td>{{ $row->total_timbang }}</td>
                     <td>{{ $row->total_stunting }}</td>
                     <td>{{ $row->total_gizi_kurang }}</td>
+                @elseif($jenis === 'kehamilan')
+                    <td>{{ $i+1 }}</td>
+                    <td>{{ $row->ibu?->posyandu?->nama ?? '-' }}</td>
+                    <td>{{ $row->ibu?->nama ?? '-' }}</td>
+                    <td>{{ \Carbon\Carbon::parse($row->hpht)->format('d/m/Y') }}</td>
+                    <td>{{ $row->tgl_perkiraan_lahir ? \Carbon\Carbon::parse($row->tgl_perkiraan_lahir)->format('d/m/Y') : '-' }}</td>
+                    <td>{{ ucfirst($row->status ?? '-') }}</td>
+                @elseif($jenis === 'sdidtk')
+                    <td>{{ $i+1 }}</td>
+                    <td>{{ $row->anak?->posyandu?->nama ?? '-' }}</td>
+                    <td>{{ $row->anak?->nama ?? '-' }}</td>
+                    <td>{{ \Carbon\Carbon::parse($row->tgl_periksa)->format('d/m/Y') }}</td>
+                    <td>{{ $row->usia_bulan }} bln</td>
+                    <td>{{ $row->motorik_kasar }}</td>
+                    <td>{{ $row->motorik_halus }}</td>
+                    <td>{{ $row->bicara_bahasa }}</td>
+                    <td>{{ $row->sosial_kemandirian }}</td>
+                    <td>{{ $row->hasil }}</td>
+                @elseif($jenis === 'obat_cacing')
+                    <td>{{ $i+1 }}</td>
+                    <td>{{ $row->anak?->posyandu?->nama ?? '-' }}</td>
+                    <td>{{ $row->anak?->nama ?? '-' }}</td>
+                    <td>{{ \Carbon\Carbon::parse($row->tgl_pemberian)->format('d/m/Y') }}</td>
+                    <td>{{ $row->dosis }}</td>
+                    <td>{{ $row->kader?->name ?? '-' }}</td>
                 @endif
             </tr>
             @endforeach

@@ -17,8 +17,8 @@ class VitaminAResource extends Resource
     protected static ?string $navigationLabel  = 'Vitamin A';
     protected static ?string $modelLabel       = 'Data Vitamin A';
     protected static ?string $pluralModelLabel = 'Vitamin A';
-    protected static ?string $navigationGroup  = 'Transaksi';
-    protected static ?int    $navigationSort   = 3;
+    protected static ?string $navigationGroup  = 'Kesehatan Ibu & Anak';
+    protected static ?int    $navigationSort   = 9;
 
     public static function form(Form $form): Form
     {
@@ -80,6 +80,9 @@ class VitaminAResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('no')
+                    ->label('No')
+                    ->rowIndex(),
                 Tables\Columns\TextColumn::make('posyandu.nama')
                     ->label('Posyandu')
                     ->searchable(),
@@ -130,7 +133,8 @@ class VitaminAResource extends Resource
                     ->color('danger')
                     ->icon(null),
             ])
-            ->bulkActions([]);
+            ->bulkActions([])
+            ->paginated(false);
     }
 
     public static function getPages(): array

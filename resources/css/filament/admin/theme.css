@@ -253,32 +253,32 @@
 
 /* ── SECTION ── */
 .fi-section {
-    border-radius: 0.75rem !important;
-    border: 1px solid #e2e8f0 !important;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05) !important;
-    background: #ffffff !important;
-    overflow: visible !important;
+  border-radius: 0.75rem !important;
+  border: 1px solid #e2e8f0 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05) !important;
+  background: #ffffff !important;
+  overflow: visible !important;
 }
 
 /* Fix dropdown yang terpotong — hanya di wrapper konten */
 .fi-section-content-ctn,
 .fi-section-content {
-    overflow: visible !important;
-    border-radius: 0 0 0.75rem 0.75rem !important;
+  overflow: visible !important;
+  border-radius: 0 0 0.75rem 0.75rem !important;
 }
 
 /* Pastikan header section juga rounded atas */
 .fi-section-header {
-    border-radius: 0.75rem 0.75rem 0 0 !important;
+  border-radius: 0.75rem 0.75rem 0 0 !important;
 }
 
 /* Background putih di content agar border radius terlihat */
 .fi-section-content {
-    background: #ffffff !important;
+  background: #ffffff !important;
 }
 
 /* Tabel tetap overflow hidden agar rounded benar */
 .fi-ta-content {
-    overflow: hidden !important;
-    border-radius: 0.75rem !important;
+  overflow: hidden !important;
+  border-radius: 0.75rem !important;
 }

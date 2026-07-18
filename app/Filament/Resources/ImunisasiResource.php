@@ -18,8 +18,8 @@ class ImunisasiResource extends Resource
     protected static ?string $navigationLabel  = 'Imunisasi';
     protected static ?string $modelLabel       = 'Data Imunisasi';
     protected static ?string $pluralModelLabel = 'Imunisasi';
-    protected static ?string $navigationGroup  = 'Transaksi';
-    protected static ?int    $navigationSort   = 2;
+    protected static ?string $navigationGroup  = 'Kesehatan Ibu & Anak';
+    protected static ?int    $navigationSort   = 8;
 
     public static function form(Form $form): Form
     {
@@ -85,6 +85,9 @@ class ImunisasiResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('no')
+                    ->label('No')
+                    ->rowIndex(),
                 Tables\Columns\TextColumn::make('anak.posyandu.nama')
                     ->label('Posyandu')
                     ->searchable(),
@@ -129,7 +132,8 @@ class ImunisasiResource extends Resource
                     ->color('danger')
                     ->icon(null),
             ])
-            ->bulkActions([]);
+            ->bulkActions([])
+            ->paginated(false);
     }
 
     public static function getPages(): array

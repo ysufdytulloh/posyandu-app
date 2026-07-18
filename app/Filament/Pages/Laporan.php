@@ -36,12 +36,15 @@ class Laporan extends Page implements HasForms
     public bool    $showPreview  = false;
 
     public array $tabs = [
-        'timbang'       => 'Timbang Balita',
-        'imunisasi'     => 'Imunisasi',
-        'vitamin_a'     => 'Vitamin A',
-        'pmt'           => 'PMT Distribusi',
-        'lansia'        => 'Pemeriksaan Lansia',
-        'rekapitulasi'  => 'Rekapitulasi Desa',
+        'timbang'      => 'Timbang & Status Gizi',
+        'imunisasi'    => 'Imunisasi',
+        'vitamin_a'    => 'Vitamin A',
+        'pmt'          => 'PMT Distribusi',
+        'sdidtk'       => 'SDIDTK',
+        'obat_cacing'  => 'Obat Cacing',
+        'lansia'       => 'Pemeriksaan Lansia',
+        'kehamilan'    => 'Kehamilan',
+        'rekapitulasi' => 'Rekapitulasi Desa',
     ];
 
     public function mount(): void
@@ -74,6 +77,7 @@ class Laporan extends Page implements HasForms
 
                 Select::make('bulan')
                     ->label('Bulan')
+                    ->hidden(fn () => $this->activeTab === 'kehamilan')
                     ->options([
                         '1' => 'Januari',   '2'  => 'Februari',
                         '3' => 'Maret',     '4'  => 'April',
@@ -147,8 +151,55 @@ class Laporan extends Page implements HasForms
                 ->when($this->posyandu_id, fn($q) => $q->where('id', $this->posyandu_id))
                 ->get(),
 
+            'sdidtk' => \App\Models\Sdidtk::with(['anak', 'anak.posyandu', 'kader'])
+                ->when($this->posyandu_id, fn($q) => $q->whereHas('anak', fn($q) =>
+                    $q->where('posyandu_id', $this->posyandu_id)))
+                ->when($this->bulan, fn($q) => $q->whereMonth('tgl_periksa', $this->bulan))
+                ->when($this->tahun, fn($q) => $q->whereYear('tgl_periksa', $this->tahun))
+                ->get(),
+
+            'obat_cacing' => \App\Models\ObatCacing::with(['anak', 'anak.posyandu', 'kader'])
+                ->when($this->posyandu_id, fn($q) => $q->whereHas('anak', fn($q) =>
+                    $q->where('posyandu_id', $this->posyandu_id)))
+                ->when($this->bulan, fn($q) => $q->whereMonth('tgl_pemberian', $this->bulan))
+                ->when($this->tahun, fn($q) => $q->whereYear('tgl_pemberian', $this->tahun))
+                ->get(),
+
+            'kehamilan' => \App\Models\Kehamilan::with(['ibu', 'ibu.posyandu', 'periksaKehamilan.kader'])
+                ->when($this->posyandu_id, fn($q) => $q->whereHas('ibu', fn($q) =>
+                    $q->where('posyandu_id', $this->posyandu_id)
+                ))
+                ->when($this->tahun, fn($q) => $q->whereYear('created_at', $this->tahun))
+                ->get(),
+
+            'sdidtk' => \App\Models\Sdidtk::with(['anak', 'anak.posyandu', 'kader'])
+                ->when($this->posyandu_id, fn($q) => $q->whereHas('anak', fn($q) =>
+                    $q->where('posyandu_id', $this->posyandu_id)))
+                ->when($this->bulan, fn($q) => $q->whereMonth('tgl_periksa', $this->bulan))
+                ->when($this->tahun, fn($q) => $q->whereYear('tgl_periksa', $this->tahun))
+                ->get(),
+
+            'obat_cacing' => \App\Models\ObatCacing::with(['anak', 'anak.posyandu', 'kader'])
+                ->when($this->posyandu_id, fn($q) => $q->whereHas('anak', fn($q) =>
+                    $q->where('posyandu_id', $this->posyandu_id)))
+                ->when($this->bulan, fn($q) => $q->whereMonth('tgl_pemberian', $this->bulan))
+                ->when($this->tahun, fn($q) => $q->whereYear('tgl_pemberian', $this->tahun))
+                ->get(),
+
             default => collect(),
+
         };
+
+        // Untuk kehamilan, tambahkan data periksa terpisah
+        if ($this->activeTab === 'kehamilan') {
+            $periksaIds = $data->pluck('id');
+            $periksa = \App\Models\PeriksaKehamilan::with(['kehamilan.ibu', 'kader'])
+                ->whereIn('kehamilan_id', $periksaIds)
+                ->when($this->tahun, fn($q) => $q->whereYear('tgl_periksa', $this->tahun))
+                ->orderBy('tgl_periksa')
+                ->get();
+            return ['data' => $data, 'periksa' => $periksa];
+        }
 
         return ['data' => $data];
     }
