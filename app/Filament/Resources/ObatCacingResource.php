@@ -86,12 +86,10 @@ class ObatCacingResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('anak.nama')
                     ->label('Nama Anak')
-                    ->searchable()
-                    ->sortable(),
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('tgl_pemberian')
                     ->label('Tgl Pemberian')
-                    ->date('d/m/Y')
-                    ->sortable(),
+                    ->date('d/m/Y'),
                 Tables\Columns\TextColumn::make('dosis')
                     ->label('Dosis')
                     ->badge()

@@ -1,4 +1,4 @@
-/* ── Reset Filament wrapper ── */
+/* ── Reset Filament wrapper — LOGIN PAGE ONLY ── */
 .fi-simple-layout {
   display: block !important;
   padding: 0 !important;
@@ -25,20 +25,15 @@
   display: none !important;
 }
 
-/* ── Input ── */
-.fi-input-wrp {
+/* ── Input — LOGIN PAGE ── */
+.fi-simple-layout .fi-input-wrp {
   border-radius: 0.6rem !important;
   border: 1.5px solid #e5e7eb !important;
   background: #fff !important;
   transition: all 0.2s !important;
 }
 
-.fi-input-wrp:focus-within {
-  border-color: #059669 !important;
-  box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1) !important;
-}
-
-.fi-input {
+.fi-simple-layout .fi-input {
   background: transparent !important;
   border: none !important;
   font-family: 'Inter', sans-serif !important;
@@ -48,11 +43,11 @@
   box-shadow: none !important;
 }
 
-.fi-input::placeholder {
+.fi-simple-layout .fi-input::placeholder {
   color: #9ca3af !important;
 }
 
-.fi-input:focus {
+.fi-simple-layout .fi-input:focus {
   outline: none !important;
   box-shadow: none !important;
   border: none !important;
@@ -73,39 +68,77 @@
   display: block !important;
 }
 
-/* ── Button ── */
-.fi-btn-color-primary.fi-btn {
-  width: 100% !important;
-  justify-content: center !important;
-  padding: 0.78rem 1.5rem !important;
-  border-radius: 0.6rem !important;
-  font-family: 'Inter', sans-serif !important;
-  font-size: 0.9rem !important;
-  font-weight: 600 !important;
-  border: none !important;
-  color: #fff !important;
-  cursor: pointer !important;
+/* ── Input — PANEL (compact) ── */
+.fi-panel-admin .fi-input-wrp,
+.fi-panel-kader .fi-input-wrp {
+  border-radius: 0.375rem !important;
+  border: 1px solid #e2e8f0 !important;
+  background: #fff !important;
+  transition: all 0.2s !important;
+}
+
+.fi-panel-admin .fi-input,
+.fi-panel-kader .fi-input {
+  padding: 0.5rem 0.75rem !important;
+  font-size: 0.875rem !important;
+}
+
+/* ── Button — Panel Admin (hijau) ── */
+.fi-panel-admin .fi-btn-color-primary.fi-btn {
   background: linear-gradient(135deg, #059669, #047857) !important;
   box-shadow: 0 4px 18px rgba(5, 150, 105, 0.35) !important;
-  transition: all 0.25s !important;
 }
-
-.fi-btn-color-primary.fi-btn:hover {
+.fi-panel-admin .fi-btn-color-primary.fi-btn:hover {
   background: linear-gradient(135deg, #047857, #065f46) !important;
   box-shadow: 0 6px 26px rgba(5, 150, 105, 0.45) !important;
-  transform: translateY(-1px) !important;
 }
-
-.fi-btn-color-primary.fi-btn:active {
-  transform: translateY(0) !important;
+.fi-panel-admin .fi-input-wrp:focus-within {
+  border-color: #059669 !important;
+  box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1) !important;
 }
-
-/* ── Checkbox ── */
-.fi-checkbox-input:checked {
+.fi-panel-admin .fi-checkbox-input:checked {
   background-color: #059669 !important;
   border-color: #059669 !important;
 }
 
-.fi-fo-actions {
-  margin-top: 0 !important;
+/* ── Search bar focus — Panel Admin ── */
+.fi-panel-admin .fi-global-search-field:focus-within {
+  outline: 2px solid #059669 !important;
+  outline-offset: 0px !important;
+  border-radius: 0.5rem !important;
 }
+
+/* ── Button — Panel Kader (biru) ── */
+.fi-panel-kader .fi-btn-color-primary.fi-btn {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8) !important;
+  box-shadow: 0 4px 18px rgba(37, 99, 235, 0.35) !important;
+}
+.fi-panel-kader .fi-btn-color-primary.fi-btn:hover {
+  background: linear-gradient(135deg, #1d4ed8, #1e40af) !important;
+  box-shadow: 0 6px 26px rgba(37, 99, 235, 0.45) !important;
+}
+.fi-panel-kader .fi-input-wrp:focus-within {
+  border-color: #2563eb !important;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1) !important;
+}
+.fi-panel-kader .fi-checkbox-input:checked {
+  background-color: #2563eb !important;
+  border-color: #2563eb !important;
+}
+
+/* ── Search bar focus — Panel Kader ── */
+.fi-panel-kader .fi-global-search-field:focus-within {
+  outline: 2px solid #2563eb !important;
+  outline-offset: 0px !important;
+  border-radius: 0.5rem !important;
+}
+
+/* ── NOTIFICATION BELL ── */
+.fi-notifications-trigger-btn {
+  color: #ef4444 !important;
+}
+.fi-notifications-trigger-btn .fi-badge {
+  background: #ef4444 !important;
+  color: #ffffff !important;
+}
+

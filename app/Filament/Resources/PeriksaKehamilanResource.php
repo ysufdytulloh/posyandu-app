@@ -170,12 +170,10 @@ class PeriksaKehamilanResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('kehamilan.ibu.nama')
                     ->label('Nama Ibu')
-                    ->searchable()
-                    ->sortable(),
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('tgl_periksa')
                     ->label('Tgl Periksa')
-                    ->date('d/m/Y')
-                    ->sortable(),
+                    ->date('d/m/Y'),
                 Tables\Columns\TextColumn::make('kunjungan_ke')
                     ->label('Kunjungan')
                     ->badge()

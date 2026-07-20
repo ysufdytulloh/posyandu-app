@@ -118,12 +118,10 @@ class SdidtkResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('anak.nama')
                     ->label('Nama Anak')
-                    ->searchable()
-                    ->sortable(),
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('tgl_periksa')
                     ->label('Tgl Periksa')
-                    ->date('d/m/Y')
-                    ->sortable(),
+                    ->date('d/m/Y'),
                 Tables\Columns\TextColumn::make('usia_bulan')
                     ->label('Usia')
                     ->formatStateUsing(fn ($state) => $state . ' bulan'),

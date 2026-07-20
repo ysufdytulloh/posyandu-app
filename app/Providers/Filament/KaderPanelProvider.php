@@ -3,18 +3,17 @@
 namespace App\Providers\Filament;
 
 use Filament\Http\Middleware\Authenticate;
-use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
-use Filament\Widgets;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
+use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 
@@ -25,19 +24,40 @@ class KaderPanelProvider extends PanelProvider
         return $panel
             ->id('kader')
             ->path('kader')
+            ->login(\App\Filament\Kader\Pages\Login::class)
+
             ->colors([
-                'primary' => Color::Amber,
+                'primary' => Color::Blue,
             ])
+            ->darkMode(false)
+            ->brandName('SIP Posyandu')
+            ->sidebarCollapsibleOnDesktop()
             ->discoverResources(in: app_path('Filament/Kader/Resources'), for: 'App\\Filament\\Kader\\Resources')
             ->discoverPages(in: app_path('Filament/Kader/Pages'), for: 'App\\Filament\\Kader\\Pages')
-            ->pages([
-                Pages\Dashboard::class,
-            ])
             ->discoverWidgets(in: app_path('Filament/Kader/Widgets'), for: 'App\\Filament\\Kader\\Widgets')
-            ->widgets([
-                Widgets\AccountWidget::class,
-                Widgets\FilamentInfoWidget::class,
+            ->pages([
+                \App\Filament\Kader\Pages\Dashboard::class,
             ])
+            ->navigationGroups([
+                \Filament\Navigation\NavigationGroup::make('Kesehatan Ibu & Anak')
+                    ->icon('heroicon-o-heart'),
+                \Filament\Navigation\NavigationGroup::make('Kesehatan Lansia')
+                    ->icon('heroicon-o-user-circle'),
+                \Filament\Navigation\NavigationGroup::make('PMT')
+                    ->icon('heroicon-o-gift'),
+                \Filament\Navigation\NavigationGroup::make('Laporan')
+                    ->icon('heroicon-o-document-chart-bar'),
+            ])
+            ->widgets([
+                \App\Filament\Kader\Widgets\KaderStatsOverview::class,
+                \App\Filament\Kader\Widgets\KaderTimbangChart::class,
+            ])
+            ->authGuard('web')
+            ->authMiddleware([
+                Authenticate::class,
+                \App\Http\Middleware\EnsureUserIsKader::class,
+            ])
+            ->widgets([])
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
@@ -51,6 +71,19 @@ class KaderPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
+            ])
+            ->databaseNotifications()
+            ->databaseNotificationsPolling('30s')
+            ->userMenuItems([
+                'edit-profil' => \Filament\Navigation\MenuItem::make()
+                    ->label('Edit Profil')
+                    ->url(fn () => \App\Filament\Kader\Pages\EditProfileKader::getUrl())
+                    ->icon('heroicon-o-pencil-square'),
+            ])
+
+            ->viteTheme([
+                'resources/css/filament/kader/theme.css',
+                'resources/js/app.js',
             ]);
     }
 }

@@ -83,19 +83,16 @@ class KehamilanResource extends Resource
                     ->rowIndex(),
                 Tables\Columns\TextColumn::make('ibu.nama')
                     ->label('Nama Ibu')
-                    ->searchable()
-                    ->sortable(),
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('ibu.posyandu.nama')
                     ->label('Posyandu')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('hpht')
                     ->label('HPHT')
-                    ->date('d/m/Y')
-                    ->sortable(),
+                    ->date('d/m/Y'),
                 Tables\Columns\TextColumn::make('usia_kehamilan')
                     ->label('Usia')
-                    ->formatStateUsing(fn ($state) => $state . ' minggu')
-                    ->sortable(),
+                    ->formatStateUsing(fn ($state) => $state . ' minggu'),
                 Tables\Columns\TextColumn::make('tgl_perkiraan_lahir')
                     ->label('HPL')
                     ->date('d/m/Y'),

@@ -11,33 +11,30 @@ use Illuminate\Console\Command;
 class KirimNotifikasiKesehatan extends Command
 {
     protected $signature   = 'posyandu:notifikasi-kesehatan';
-    protected $description = 'Kirim notifikasi kasus stunting & gizi kurang baru';
+    protected $description = 'Kirim notifikasi kasus stunting & gizi kurang baru ke admin dan kader';
 
     public function handle(): void
     {
+        // ── NOTIFIKASI ADMIN ──
         $admins = User::where('role', 'admin_desa')->get();
 
-        // Stunting baru bulan ini
         $stuntingBaru = HasilGizi::whereIn('status_tbU', ['Pendek', 'Sangat Pendek'])
             ->whereHas('timbang', fn ($q) => $q
                 ->whereMonth('tgl_periksa', now()->month)
                 ->whereYear('tgl_periksa', now()->year)
-            )->with('timbang.anak')
-            ->get();
+            )->count();
 
-        // Gizi kurang baru bulan ini
         $giziKurangBaru = HasilGizi::whereIn('status_bbU', ['Gizi Kurang', 'Gizi Buruk'])
             ->whereHas('timbang', fn ($q) => $q
                 ->whereMonth('tgl_periksa', now()->month)
                 ->whereYear('tgl_periksa', now()->year)
-            )->with('timbang.anak')
-            ->get();
+            )->count();
 
         foreach ($admins as $admin) {
-            if ($stuntingBaru->count() > 0) {
+            if ($stuntingBaru > 0) {
                 Notification::make()
                     ->title('⚠️ Kasus Stunting Baru')
-                    ->body($stuntingBaru->count() . ' balita terdeteksi stunting bulan ' . now()->translatedFormat('F Y'))
+                    ->body($stuntingBaru . ' balita terdeteksi stunting bulan ' . now()->translatedFormat('F Y'))
                     ->warning()
                     ->icon('heroicon-o-arrow-trending-down')
                     ->actions([
@@ -49,10 +46,10 @@ class KirimNotifikasiKesehatan extends Command
                     ->sendToDatabase($admin);
             }
 
-            if ($giziKurangBaru->count() > 0) {
+            if ($giziKurangBaru > 0) {
                 Notification::make()
                     ->title('🚨 Kasus Gizi Kurang Baru')
-                    ->body($giziKurangBaru->count() . ' balita terdeteksi gizi kurang/buruk bulan ' . now()->translatedFormat('F Y'))
+                    ->body($giziKurangBaru . ' balita terdeteksi gizi kurang/buruk bulan ' . now()->translatedFormat('F Y'))
                     ->danger()
                     ->icon('heroicon-o-exclamation-triangle')
                     ->actions([
@@ -65,6 +62,57 @@ class KirimNotifikasiKesehatan extends Command
             }
         }
 
-        $this->info('Notifikasi berhasil dikirim!');
+        // ── NOTIFIKASI KADER ──
+        $kaders = User::where('role', 'kader')->get();
+
+        foreach ($kaders as $kader) {
+            $posyanduId = $kader->posyandu_id;
+
+            $stuntingKader = HasilGizi::whereIn('status_tbU', ['Pendek', 'Sangat Pendek'])
+                ->whereHas('timbang', fn ($q) => $q
+                    ->where('posyandu_id', $posyanduId)
+                    ->whereMonth('tgl_periksa', now()->month)
+                    ->whereYear('tgl_periksa', now()->year)
+                )->count();
+
+            $giziKurangKader = HasilGizi::whereIn('status_bbU', ['Gizi Kurang', 'Gizi Buruk'])
+                ->whereHas('timbang', fn ($q) => $q
+                    ->where('posyandu_id', $posyanduId)
+                    ->whereMonth('tgl_periksa', now()->month)
+                    ->whereYear('tgl_periksa', now()->year)
+                )->count();
+
+            if ($stuntingKader > 0) {
+                Notification::make()
+                    ->title('⚠️ Kasus Stunting Baru')
+                    ->body($stuntingKader . ' balita di posyandu Anda terdeteksi stunting bulan ' . now()->translatedFormat('F Y'))
+                    ->warning()
+                    ->icon('heroicon-o-arrow-trending-down')
+                    ->actions([
+                        Action::make('lihat')
+                            ->label('Lihat Laporan')
+                            ->url('/kader/laporan')
+                            ->button(),
+                    ])
+                    ->sendToDatabase($kader);
+            }
+
+            if ($giziKurangKader > 0) {
+                Notification::make()
+                    ->title('🚨 Kasus Gizi Kurang Baru')
+                    ->body($giziKurangKader . ' balita di posyandu Anda terdeteksi gizi kurang/buruk bulan ' . now()->translatedFormat('F Y'))
+                    ->danger()
+                    ->icon('heroicon-o-exclamation-triangle')
+                    ->actions([
+                        Action::make('lihat')
+                            ->label('Lihat Laporan')
+                            ->url('/kader/laporan')
+                            ->button(),
+                    ])
+                    ->sendToDatabase($kader);
+            }
+        }
+
+        $this->info('Notifikasi berhasil dikirim ke admin dan kader!');
     }
 }

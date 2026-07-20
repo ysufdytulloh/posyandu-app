@@ -96,7 +96,7 @@ class Laporan extends Page implements HasForms
                     )
                     ->native(false),
             ])
-            ->columns(3);
+            ->columns(2);
     }
 
     public function tampilkan(): void

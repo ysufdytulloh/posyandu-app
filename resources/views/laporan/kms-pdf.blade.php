@@ -59,7 +59,7 @@ kms-pdf.blade.php
    {{-- KOP SURAT --}}
     <div class="kop-surat">
         <div class="sistem" style="text-transform: uppercase;">SISTEM INFORMASI POSYANDU</div>
-        @if($posyandu)
+        @if(isset($posyandu) && $posyandu)
             <h1 style="text-transform: uppercase;">{{ strtoupper($posyandu->nama) }}</h1>
             <div class="sub" style="text-transform: uppercase;">
                 KEL. {{ strtoupper($posyandu->kelurahan) }} - KEC. {{ strtoupper($posyandu->kecamatan) }}
