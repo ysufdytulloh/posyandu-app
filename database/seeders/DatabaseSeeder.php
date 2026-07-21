@@ -9,9 +9,10 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call([
+            ZscoreReferensiSeeder::class,
             JenisImunisasiSeeder::class,
             JenisPmtSeeder::class,
-            ZScoreReferensiSeeder::class,
+            DatabaseCompleteSeeder::class,
         ]);
     }
 }
