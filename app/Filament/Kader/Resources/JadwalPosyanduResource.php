@@ -13,7 +13,6 @@ use Filament\Tables\Table;
 class JadwalPosyanduResource extends Resource
 {
     protected static ?string $model = JadwalPosyandu::class;
-    protected static ?string $navigationIcon  = 'heroicon-o-calendar-days';
     protected static ?string $navigationLabel = 'Jadwal Posyandu';
     protected static ?string $navigationGroup = 'Posyandu';
     protected static ?int    $navigationSort  = 2;
@@ -73,14 +72,15 @@ class JadwalPosyanduResource extends Resource
                 Tables\Columns\TextColumn::make('tgl_jadwal')
                     ->label('Tanggal')
                     ->date('d/m/Y')
-                    ->sortable(),
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('jam_mulai')
                     ->label('Jam Mulai'),
                 Tables\Columns\TextColumn::make('jam_selesai')
                     ->label('Jam Selesai'),
                 Tables\Columns\TextColumn::make('keterangan')
                     ->label('Keterangan')
-                    ->limit(30),
+                    ->limit(30)
+                    ->searchable(),
                 Tables\Columns\BadgeColumn::make('status')
                     ->label('Status')
                     ->colors([
@@ -91,17 +91,39 @@ class JadwalPosyanduResource extends Resource
             ])
             ->defaultSort('tgl_jadwal', 'asc')
             ->filters([
+                Tables\Filters\SelectFilter::make('posyandu_id')
+                    ->label('Posyandu')
+                    ->relationship('posyandu', 'nama')
+                    ->native(false),
                 Tables\Filters\SelectFilter::make('status')
+                    ->label('Status')
                     ->options([
                         'aktif'   => 'Aktif',
                         'selesai' => 'Selesai',
                         'batal'   => 'Batal',
-                    ]),
+                    ])
+                    ->native(false),
             ])
+            ->filtersTriggerAction(
+                fn (Tables\Actions\Action $action) => $action
+                    ->button()
+                    ->label('Filter')
+                    ->icon('heroicon-o-funnel')
+            )
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
-            ]);
+                Tables\Actions\EditAction::make()
+                    ->label('Edit Data')
+                    ->button()
+                    ->color('warning')
+                    ->icon(null),
+                Tables\Actions\DeleteAction::make()
+                    ->label('Hapus')
+                    ->button()
+                    ->color('danger')
+                    ->icon(null),
+            ])
+            ->bulkActions([])
+            ->paginated(false);
     }
 
     public static function getPages(): array

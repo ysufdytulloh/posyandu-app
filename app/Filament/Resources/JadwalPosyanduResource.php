@@ -69,12 +69,10 @@ class JadwalPosyanduResource extends Resource
                     ->rowIndex(),
                 Tables\Columns\TextColumn::make('posyandu.nama')
                     ->label('Posyandu')
-                    ->searchable()
-                    ->sortable(),
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('tgl_jadwal')
                     ->label('Tanggal')
-                    ->date('d/m/Y')
-                    ->sortable(),
+                    ->date('d/m/Y'),
                 Tables\Columns\TextColumn::make('jam_mulai')
                     ->label('Jam Mulai'),
                 Tables\Columns\TextColumn::make('jam_selesai')
@@ -94,23 +92,37 @@ class JadwalPosyanduResource extends Resource
             ->filters([
                 Tables\Filters\SelectFilter::make('posyandu_id')
                     ->label('Posyandu')
-                    ->relationship('posyandu', 'nama'),
+                    ->relationship('posyandu', 'nama')
+                    ->native(false),
                 Tables\Filters\SelectFilter::make('status')
+                    ->label('Status')
                     ->options([
                         'aktif'   => 'Aktif',
                         'selesai' => 'Selesai',
                         'batal'   => 'Batal',
-                    ]),
+                    ])
+                    ->native(false),
             ])
+            ->filtersTriggerAction(
+                fn (Tables\Actions\Action $action) => $action
+                    ->button()
+                    ->label('Filter')
+                    ->icon('heroicon-o-funnel')
+            )
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\EditAction::make()
+                    ->label('Edit Data')
+                    ->button()
+                    ->color('warning')
+                    ->icon(null),
+                Tables\Actions\DeleteAction::make()
+                    ->label('Hapus')
+                    ->button()
+                    ->color('danger')
+                    ->icon(null),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
-            ]);
+            ->bulkActions([])
+            ->paginated(false);
     }
 
     public static function getPages(): array

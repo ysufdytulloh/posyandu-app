@@ -39,14 +39,21 @@ class KaderPanelProvider extends PanelProvider
                 \App\Filament\Kader\Pages\Dashboard::class,
             ])
             ->navigationGroups([
+                \Filament\Navigation\NavigationGroup::make('Posyandu')
+                    ->icon('heroicon-o-building-office-2')
+                    ->collapsed(true),
                 \Filament\Navigation\NavigationGroup::make('Kesehatan Ibu & Anak')
-                    ->icon('heroicon-o-heart'),
+                    ->icon('heroicon-o-heart')
+                    ->collapsed(true),
                 \Filament\Navigation\NavigationGroup::make('Kesehatan Lansia')
-                    ->icon('heroicon-o-user-circle'),
+                    ->icon('heroicon-o-user-group')
+                    ->collapsed(true),
                 \Filament\Navigation\NavigationGroup::make('PMT')
-                    ->icon('heroicon-o-gift'),
+                    ->icon('heroicon-o-cake')
+                    ->collapsed(true),
                 \Filament\Navigation\NavigationGroup::make('Laporan')
-                    ->icon('heroicon-o-document-chart-bar'),
+                    ->icon('heroicon-o-document-chart-bar')
+                    ->collapsed(true),
             ])
             ->widgets([
                 \App\Filament\Kader\Widgets\KaderStatsOverview::class,
