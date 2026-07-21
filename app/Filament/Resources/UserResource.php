@@ -89,6 +89,18 @@ class UserResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->headerActions([
+                    Tables\Actions\Action::make('exportOrangTua')
+                        ->label('Export Akun Orang Tua')
+                        ->icon('heroicon-o-arrow-down-tray')
+                        ->color('success')
+                        ->action(function () {
+                            return \Maatwebsite\Excel\Facades\Excel::download(
+                                new \App\Exports\OrangTuaExport(),
+                                'akun-orang-tua-' . now()->format('d-m-Y') . '.xlsx'
+                            );
+                        }),
+                ])
             ->recordUrl(null)
             ->columns([
                 Tables\Columns\TextColumn::make('no')
@@ -122,6 +134,8 @@ class UserResource extends Resource
                     )
                     ->searchable(false),
             ])
+
+
             ->defaultSort('name')
             ->searchPlaceholder('Cari nama atau email...')
             ->filters([

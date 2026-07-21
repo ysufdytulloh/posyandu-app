@@ -20,4 +20,17 @@ class Posyandu extends Model
     public function ibu(): HasMany     { return $this->hasMany(Ibu::class); }
     public function anak(): HasMany    { return $this->hasMany(Anak::class); }
     public function lansia(): HasMany  { return $this->hasMany(Lansia::class); }
+
+    public function jadwalPosyandu()
+    {
+        return $this->hasMany(JadwalPosyandu::class);
+    }
+
+    public function jadwalBerikutnya()
+    {
+        return $this->hasOne(JadwalPosyandu::class)
+            ->where('tgl_jadwal', '>=', now()->toDateString())
+            ->where('status', 'aktif')
+            ->orderBy('tgl_jadwal');
+    }
 }

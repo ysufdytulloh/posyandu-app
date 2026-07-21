@@ -12,7 +12,17 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        // $schedule->command('inspire')->hourly();
+        // Notifikasi stunting & gizi kurang — setiap tanggal 1 jam 07.00
+        $schedule->command('posyandu:notifikasi-kesehatan')
+            ->monthlyOn(1, '07:00')
+            ->timezone('Asia/Jakarta');
+
+        // Update status jadwal posyandu yang sudah lewat — setiap hari jam 00.01
+        $schedule->call(function () {
+            \App\Models\JadwalPosyandu::where('tgl_jadwal', '<', now()->toDateString())
+                ->where('status', 'aktif')
+                ->update(['status' => 'selesai']);
+        })->dailyAt('00:01')->timezone('Asia/Jakarta');
     }
 
     /**
